@@ -1,0 +1,741 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8">
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/hakilink-logo.jpg">
+    <title>Client Dashboard | HakiLink</title>
+
+    <link
+      rel="stylesheet"
+      href="../styles/client-dashboard.css">
+
+  </head>
+
+  <body>
+
+    <div class="dashboard-layout">
+
+      <!-- ========================================= -->
+      <!-- SIDEBAR -->
+      <!-- ========================================= -->
+
+      <aside class="sidebar" id="sidebar">
+
+        <!-- LOGO -->
+
+        <div class="sidebar-logo">
+
+          <a href="../index.html" class="logo">
+
+            <span class="logo-icon">⚖</span>
+
+            <span>
+              Haki<span>Link</span>
+            </span>
+
+          </a>
+
+        </div>
+
+        <!-- NAVIGATION -->
+
+        <nav class="sidebar-nav">
+
+          <p class="nav-label">
+            MENU
+          </p>
+
+          <a
+            href="#"
+            class="nav-item active">
+
+            <span class="nav-icon">
+              ⌂
+            </span>
+
+            <span>
+              Dashboard
+            </span>
+
+          </a>
+
+          <a
+            href="#find-lawyer"
+            class="nav-item">
+
+            <span class="nav-icon">
+              ⚖
+            </span>
+
+            <span>
+              Find a Lawyer
+            </span>
+
+          </a>
+
+          <a
+            href="#requests"
+            class="nav-item">
+
+            <span class="nav-icon">
+              📋
+            </span>
+
+            <span>
+              My Requests
+            </span>
+
+            <span class="nav-badge">
+              0
+            </span>
+
+          </a>
+
+          <a
+            href="#messages"
+            class="nav-item">
+
+            <span class="nav-icon">
+              💬
+            </span>
+
+            <span>
+              Messages
+            </span>
+
+            <span class="nav-badge">
+              0
+            </span>
+
+          </a>
+
+          <p class="nav-label secondary">
+            SUPPORT
+          </p>
+
+          <a
+            href="#ai-assistant"
+            class="nav-item">
+
+            <span class="nav-icon">
+              ✨
+            </span>
+
+            <span>
+              AI Legal Assistant
+            </span>
+
+          </a>
+
+          <a
+            href="#profile"
+            class="nav-item">
+
+            <span class="nav-icon">
+              👤
+            </span>
+
+            <span>
+              My Profile
+            </span>
+
+          </a>
+
+        </nav>
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+          <button
+            class="logout-button"
+            id="logoutButton">
+
+            <span>
+              ↪
+            </span>
+
+            Logout
+
+          </button>
+
+        </div>
+
+      </aside>
+
+      <!-- ========================================= -->
+      <!-- MAIN AREA -->
+      <!-- ========================================= -->
+
+      <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+          <button
+            class="menu-button"
+            id="menuButton">
+
+            ☰
+
+          </button>
+
+          <div class="topbar-right">
+
+            <!-- NOTIFICATIONS -->
+
+            <button
+              class="notification-button"
+              id="notificationButton">
+
+              🔔
+
+              <span class="notification-dot"></span>
+
+            </button>
+
+            <!-- USER -->
+
+            <div class="user-menu">
+
+              <div class="user-avatar" id="userAvatar">
+                ?
+              </div>
+
+              <div class="user-info">
+
+                <strong id="topbarUserName">
+                  Loading...
+                </strong>
+
+                <span>
+                  Client
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </header>
+
+        <!-- ========================================= -->
+        <!-- DASHBOARD CONTENT -->
+        <!-- ========================================= -->
+
+        <div class="dashboard-content">
+
+          <!-- WELCOME -->
+
+          <section class="welcome-section">
+
+            <div>
+
+              <span class="eyebrow">
+                CLIENT DASHBOARD
+              </span>
+
+              <h1>
+                Welcome back,
+                <span id="welcomeName">
+                  ...
+                </span>
+              </h1>
+
+              <p>
+                Find the right legal professional
+                and manage your legal journey
+                from one place.
+              </p>
+
+            </div>
+
+            <a
+              href="#find-lawyer"
+              class="primary-button">
+
+              Find a Lawyer
+
+              <span>→</span>
+
+            </a>
+
+          </section>
+
+          <!-- ========================================= -->
+          <!-- STATISTICS -->
+          <!-- ========================================= -->
+
+          <section class="stats-grid">
+
+            <div class="stat-card">
+
+              <div class="stat-icon">
+                📋
+              </div>
+
+              <div>
+
+                <span>
+                  Active Requests
+                </span>
+
+                <strong id="activeRequests">
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-icon">
+                📅
+              </div>
+
+              <div>
+
+                <span>
+                  Consultations
+                </span>
+
+                <strong id="consultations">
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-icon">
+                ⚖
+              </div>
+
+              <div>
+
+                <span>
+                  Saved Lawyers
+                </span>
+
+                <strong id="savedLawyers">
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-icon">
+                💬
+              </div>
+
+              <div>
+
+                <span>
+                  Messages
+                </span>
+
+                <strong id="messagesCount">
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- ========================================= -->
+          <!-- FIND LAWYER -->
+          <!-- ========================================= -->
+
+          <section
+            class="dashboard-section"
+            id="find-lawyer">
+
+            <div class="section-header">
+
+              <div>
+
+                <span class="eyebrow">
+                  LEGAL PROFESSIONALS
+                </span>
+
+                <h2>
+                  Find a Lawyer
+                </h2>
+
+                <p>
+                  Connect with a legal professional
+                  who understands your needs.
+                </p>
+
+              </div>
+
+              <button
+                class="text-button">
+
+                View all →
+
+              </button>
+
+            </div>
+
+            <!-- SEARCH -->
+
+            <div class="lawyer-search">
+
+              <div class="search-input">
+
+                <span>
+                  🔍
+                </span>
+
+                <input
+                  type="text"
+                  id="lawyerSearch"
+                  placeholder="Search lawyers by name or specialty...">
+
+              </div>
+
+              <select id="practiceFilter">
+
+                <option value>
+                  All practice areas
+                </option>
+
+                <option value="Criminal Law">
+                  Criminal Law
+                </option>
+
+                <option value="Family Law">
+                  Family Law
+                </option>
+
+                <option value="Corporate Law">
+                  Corporate Law
+                </option>
+
+                <option value="Property Law">
+                  Property Law
+                </option>
+
+                <option value="Employment Law">
+                  Employment Law
+                </option>
+
+                <option value="Constitutional Law">
+                  Constitutional Law
+                </option>
+
+                <option value="Commercial Law">
+                  Commercial Law
+                </option>
+
+              </select>
+
+            </div>
+
+            <!-- LAWYER CARDS -->
+
+            <div
+              class="lawyers-grid"
+              id="lawyersGrid">
+
+              <div class="empty-state">
+
+                <div class="empty-icon">
+                  ⚖
+                </div>
+
+                <h3>
+                  Lawyers will appear here
+                </h3>
+
+                <p>
+                  Once lawyers join HakiLink,
+                  you will be able to find and
+                  connect with them here.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- ========================================= -->
+          <!-- MY REQUESTS -->
+          <!-- ========================================= -->
+
+          <section
+            class="dashboard-section"
+            id="requests">
+
+            <div class="section-header">
+
+              <div>
+
+                <span class="eyebrow">
+                  YOUR LEGAL JOURNEY
+                </span>
+
+                <h2>
+                  My Legal Requests
+                </h2>
+
+                <p>
+                  Track your requests and
+                  consultations.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="requests-card">
+
+              <div class="empty-state">
+
+                <div class="empty-icon">
+                  📋
+                </div>
+
+                <h3>
+                  No legal requests yet
+                </h3>
+
+                <p>
+                  When you request assistance
+                  from a lawyer, your requests
+                  will appear here.
+                </p>
+
+                <a
+                  href="#find-lawyer"
+                  class="secondary-button">
+
+                  Find a Lawyer
+
+                </a>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- ========================================= -->
+          <!-- AI ASSISTANT -->
+          <!-- ========================================= -->
+
+          <section
+            class="ai-section"
+            id="ai-assistant">
+
+            <div class="ai-content">
+
+              <span class="ai-badge">
+                ✨ HAKILINK AI
+              </span>
+
+              <h2>
+                Need quick legal guidance?
+              </h2>
+
+              <p>
+                Get general legal information,
+                understand legal concepts and
+                learn about your options with
+                the HakiLink AI Legal Assistant.
+              </p>
+
+              <button class="ai-button">
+
+                Ask the AI Assistant
+
+                <span>→</span>
+
+              </button>
+
+            </div>
+
+            <div class="ai-visual">
+
+              <div class="ai-circle">
+                ⚖
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- ========================================= -->
+          <!-- PROFILE -->
+          <!-- ========================================= -->
+
+          <section
+            class="dashboard-section"
+            id="profile">
+
+            <div class="section-header">
+
+              <div>
+
+                <span class="eyebrow">
+                  ACCOUNT
+                </span>
+
+                <h2>
+                  My Profile
+                </h2>
+
+                <p>
+                  Your HakiLink account information.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="profile-card">
+
+              <div class="profile-header">
+
+                <div
+                  class="large-avatar"
+                  id="profileAvatar">
+
+                  ?
+
+                </div>
+
+                <div>
+
+                  <h3 id="profileName">
+                    Loading...
+                  </h3>
+
+                  <span>
+                    HakiLink Client
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="profile-details">
+
+                <div class="profile-field">
+
+                  <span>
+                    Full name
+                  </span>
+
+                  <strong id="profileFullName">
+                    Loading...
+                  </strong>
+
+                </div>
+
+                <div class="profile-field">
+
+                  <span>
+                    Email address
+                  </span>
+
+                  <strong id="profileEmail">
+                    Loading...
+                  </strong>
+
+                </div>
+
+                <div class="profile-field">
+
+                  <span>
+                    Phone number
+                  </span>
+
+                  <strong id="profilePhone">
+                    Loading...
+                  </strong>
+
+                </div>
+
+                <div class="profile-field">
+
+                  <span>
+                    Account type
+                  </span>
+
+                  <strong>
+                    Client
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- FOOTER -->
+
+          <footer class="dashboard-footer">
+
+            <p>
+              © 2026 HakiLink. Connecting people
+              with legal professionals.
+            </p>
+
+            <div>
+
+              <a href="#">
+                Privacy
+              </a>
+
+              <a href="#">
+                Terms
+              </a>
+
+              <a href="#">
+                Help
+              </a>
+
+            </div>
+
+          </footer>
+
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================================= -->
+
+    <script
+      type="module"
+      src="../js/client-dashboard.js">
+    </script>
+
+  </body>
+
+</html>
