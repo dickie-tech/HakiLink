@@ -1,0 +1,931 @@
+/* =========================================================
+   HAKILINK REGISTRATION
+========================================================= */
+
+:root {
+
+    --navy: #0B2D52;
+    --navy-dark: #061F36;
+
+    --gold: #D9A928;
+    --gold-light: #F2D36A;
+
+    --white: #FFFFFF;
+
+    --background: #F5F7FA;
+
+    --text-dark: #10243A;
+    --text-medium: #66788A;
+
+    --border: #DCE3EA;
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: var(--background);
+
+    color: var(--text-dark);
+
+}
+
+
+a {
+
+    text-decoration: none;
+
+    color: inherit;
+
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.register-page {
+
+    min-height: 100vh;
+
+    display: grid;
+
+    grid-template-columns: 42% 58%;
+
+}
+
+
+/* =========================================================
+   LEFT SIDE
+========================================================= */
+
+.register-visual {
+
+    position: relative;
+
+    min-height: 100vh;
+
+    padding: 45px 8%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(6,31,54,0.98),
+            rgba(11,45,82,0.95)
+        );
+
+}
+
+
+.register-visual::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 550px;
+
+    height: 550px;
+
+    border:
+        1px solid
+        rgba(217,169,40,0.15);
+
+    border-radius: 50%;
+
+    right: -300px;
+
+    bottom: -200px;
+
+}
+
+
+.register-visual::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+
+    height: 300px;
+
+    border:
+        1px solid
+        rgba(217,169,40,0.10);
+
+    border-radius: 50%;
+
+    left: -170px;
+
+    top: 45%;
+
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.logo {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: var(--white);
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+}
+
+
+.logo > span:last-child span {
+
+    color: var(--gold);
+
+}
+
+
+.logo-icon {
+
+    width: 44px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+    border-radius: 9px;
+
+    font-size: 22px;
+
+}
+
+
+/* =========================================================
+   VISUAL CONTENT
+========================================================= */
+
+.visual-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 480px;
+
+}
+
+
+.eyebrow {
+
+    display: block;
+
+    color: var(--gold);
+
+    font-size: 11px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.8px;
+
+    margin-bottom: 17px;
+
+}
+
+
+.visual-content h1 {
+
+    color: var(--white);
+
+    font-size:
+        clamp(45px, 5vw, 68px);
+
+    line-height: 1.04;
+
+    letter-spacing: -2px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.visual-content h1 span {
+
+    display: block;
+
+    color: var(--gold);
+
+}
+
+
+.visual-content p {
+
+    max-width: 420px;
+
+    color: #C6D2DE;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.visual-footer {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.visual-footer > span {
+
+    width: 35px;
+
+    height: 35px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(217,169,40,0.15);
+
+    color: var(--gold);
+
+    border-radius: 8px;
+
+}
+
+
+.visual-footer p {
+
+    color: #AEBECD;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   FORM SECTION
+========================================================= */
+
+.register-form-section {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    padding: 50px 6%;
+
+    overflow-y: auto;
+
+    background: var(--white);
+
+}
+
+
+.register-container {
+
+    width: 100%;
+
+    max-width: 700px;
+
+}
+
+
+/* =========================================================
+   MOBILE LOGO
+========================================================= */
+
+.mobile-logo {
+
+    display: none;
+
+    margin-bottom: 40px;
+
+}
+
+
+.mobile-logo .logo {
+
+    color: var(--navy);
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.form-header {
+
+    margin-bottom: 30px;
+
+}
+
+
+.form-header h2 {
+
+    color: var(--navy);
+
+    font-size: 38px;
+
+    margin-bottom: 9px;
+
+}
+
+
+.form-header p {
+
+    color: var(--text-medium);
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+
+}
+
+
+.form-group {
+
+    margin-bottom: 19px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    color: var(--text-dark);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    margin-bottom: 8px;
+
+}
+
+
+.form-group input,
+.form-group select {
+
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 13px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 7px;
+
+    background: #FBFCFD;
+
+    color: var(--text-dark);
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: 0.25s;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: var(--gold);
+
+    background: var(--white);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(217,169,40,0.12);
+
+}
+
+
+/* =========================================================
+   ACCOUNT TYPES
+========================================================= */
+
+.account-types {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+}
+
+
+.account-option {
+
+    cursor: pointer;
+
+}
+
+
+.account-option input {
+
+    display: none;
+
+}
+
+
+.option-card {
+
+    min-height: 82px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 8px;
+
+    background: #FBFCFD;
+
+    transition: 0.25s;
+
+}
+
+
+.account-option input:checked
++ .option-card {
+
+    border-color: var(--gold);
+
+    background:
+        rgba(217,169,40,0.08);
+
+    box-shadow:
+        0 0 0 1px
+        var(--gold);
+
+}
+
+
+.option-icon {
+
+    width: 36px;
+
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: var(--navy);
+
+    color: var(--gold);
+
+}
+
+
+.option-card strong {
+
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 12px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.option-card small {
+
+    display: block;
+
+    color: var(--text-medium);
+
+    font-size: 9px;
+
+    line-height: 1.3;
+
+}
+
+
+/* =========================================================
+   CONDITIONAL SECTIONS
+========================================================= */
+
+.conditional-section {
+
+    padding: 17px;
+
+    margin-bottom: 10px;
+
+    border:
+        1px solid
+        rgba(217,169,40,0.35);
+
+    border-radius: 9px;
+
+    background:
+        rgba(217,169,40,0.05);
+
+}
+
+
+.section-title {
+
+    color: var(--navy);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    margin-bottom: 15px;
+
+}
+
+
+.hidden {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+.password-input {
+
+    position: relative;
+
+}
+
+
+.password-input input {
+
+    padding-right: 55px;
+
+}
+
+
+.toggle-password {
+
+    position: absolute;
+
+    right: 10px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   TERMS
+========================================================= */
+
+.terms {
+
+    margin: 3px 0 20px;
+
+}
+
+
+.terms label {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    color: var(--text-medium);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+}
+
+
+.terms input {
+
+    margin-top: 2px;
+
+    accent-color: var(--gold);
+
+}
+
+
+.terms a {
+
+    color: var(--navy);
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   REGISTER BUTTON
+========================================================= */
+
+.register-button {
+
+    width: 100%;
+
+    height: 50px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    background: var(--navy);
+
+    color: var(--white);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+
+.register-button:hover {
+
+    transform: translateY(-2px);
+
+    background: #123B65;
+
+}
+
+
+.register-button span {
+
+    color: var(--gold);
+
+    font-size: 18px;
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.register-message {
+
+    min-height: 18px;
+
+    margin-top: 10px;
+
+    text-align: center;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   LOGIN LINK
+========================================================= */
+
+.login-link {
+
+    margin-top: 23px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid
+        var(--border);
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    font-size: 11px;
+
+}
+
+
+.login-link span {
+
+    color: var(--text-medium);
+
+}
+
+
+.login-link a {
+
+    color: var(--navy);
+
+    font-weight: 800;
+
+}
+
+
+.login-link a:hover {
+
+    color: var(--gold);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .register-page {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .register-visual {
+
+        display: none;
+
+    }
+
+
+    .register-form-section {
+
+        min-height: 100vh;
+
+    }
+
+
+    .mobile-logo {
+
+        display: block;
+
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .register-form-section {
+
+        padding: 30px 6%;
+
+    }
+
+
+    .form-row {
+
+        grid-template-columns: 1fr;
+
+        gap: 0;
+
+    }
+
+
+    .account-types {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .option-card {
+
+        min-height: 65px;
+
+    }
+
+
+    .form-header h2 {
+
+        font-size: 32px;
+
+    }
+
+}

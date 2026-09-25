@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | HakiLink</title>
+
+    <link rel="stylesheet" href="../styles/register.css">
+  </head>
+
+  <body>
+
+    <main class="register-page">
+
+      <!-- LEFT SIDE -->
+      <section class="register-visual">
+
+        <a href="../index.html" class="logo">
+
+          <span class="logo-icon">⚖</span>
+
+          <span>
+            Haki<span>Link</span>
+          </span>
+
+        </a>
+
+        <div class="visual-content">
+
+          <span class="eyebrow">
+            JOIN HAKILINK
+          </span>
+
+          <h1>
+            Your legal
+            <span>journey starts here.</span>
+          </h1>
+
+          <p>
+            Create your account and connect with
+            the legal professionals and resources
+            you need.
+          </p>
+
+        </div>
+
+        <div class="visual-footer">
+
+          <span>⚖</span>
+
+          <p>
+            Connecting people with legal
+            professionals.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- RIGHT SIDE -->
+
+      <section class="register-form-section">
+
+        <div class="register-container">
+
+          <!-- MOBILE LOGO -->
+
+          <div class="mobile-logo">
+
+            <a href="../index.html" class="logo">
+
+              <span class="logo-icon">⚖</span>
+
+              <span>
+                Haki<span>Link</span>
+              </span>
+
+            </a>
+
+          </div>
+
+          <!-- HEADER -->
+
+          <div class="form-header">
+
+            <span class="eyebrow">
+              CREATE ACCOUNT
+            </span>
+
+            <h2>
+              Join HakiLink
+            </h2>
+
+            <p>
+              Tell us a little about yourself
+              to get started.
+            </p>
+
+          </div>
+
+          <!-- REGISTRATION FORM -->
+
+          <form id="registerForm">
+
+            <!-- FULL NAME -->
+
+            <div class="form-group">
+
+              <label for="fullName">
+                Full name
+              </label>
+
+              <input
+                type="text"
+                id="fullName"
+                placeholder="Enter your full name"
+                required>
+
+            </div>
+
+            <!-- EMAIL + PHONE -->
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label for="email">
+                  Email address
+                </label>
+
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="you@example.com"
+                  required>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="phone">
+                  Phone number
+                </label>
+
+                <input
+                  type="tel"
+                  id="phone"
+                  placeholder="+254 7XX XXX XXX"
+                  required>
+
+              </div>
+
+            </div>
+
+            <!-- ACCOUNT TYPE -->
+
+            <div class="form-group">
+
+              <label>
+                I am registering as
+              </label>
+
+              <div class="account-types">
+
+                <label class="account-option">
+
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="client"
+                    checked>
+
+                  <span class="option-card">
+
+                    <span class="option-icon">
+                      👤
+                    </span>
+
+                    <span>
+
+                      <strong>
+                        Client
+                      </strong>
+
+                      <small>
+                        Looking for legal help
+                      </small>
+
+                    </span>
+
+                  </span>
+
+                </label>
+
+                <label class="account-option">
+
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="lawyer">
+
+                  <span class="option-card">
+
+                    <span class="option-icon">
+                      ⚖
+                    </span>
+
+                    <span>
+
+                      <strong>
+                        Lawyer
+                      </strong>
+
+                      <small>
+                        Provide legal services
+                      </small>
+
+                    </span>
+
+                  </span>
+
+                </label>
+
+                <label class="account-option">
+
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="lawfirm">
+
+                  <span class="option-card">
+
+                    <span class="option-icon">
+                      🏛
+                    </span>
+
+                    <span>
+
+                      <strong>
+                        Law Firm
+                      </strong>
+
+                      <small>
+                        Register a legal firm
+                      </small>
+
+                    </span>
+
+                  </span>
+
+                </label>
+
+              </div>
+
+            </div>
+
+            <!-- LAWYER DETAILS -->
+
+            <div
+              id="lawyerDetails"
+              class="conditional-section hidden">
+
+              <div class="section-title">
+                Lawyer information
+              </div>
+
+              <div class="form-row">
+
+                <div class="form-group">
+
+                  <label for="barNumber">
+                    Bar admission number
+                  </label>
+
+                  <input
+                    type="text"
+                    id="barNumber"
+                    placeholder="e.g. P.12345">
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="practiceArea">
+                    Practice area
+                  </label>
+
+                  <select id="practiceArea">
+
+                    <option value>
+                      Select practice area
+                    </option>
+
+                    <option>
+                      Criminal Law
+                    </option>
+
+                    <option>
+                      Family Law
+                    </option>
+
+                    <option>
+                      Corporate Law
+                    </option>
+
+                    <option>
+                      Property Law
+                    </option>
+
+                    <option>
+                      Employment Law
+                    </option>
+
+                    <option>
+                      Constitutional Law
+                    </option>
+
+                    <option>
+                      Commercial Law
+                    </option>
+
+                    <option>
+                      Other
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- LAW FIRM DETAILS -->
+
+            <div
+              id="firmDetails"
+              class="conditional-section hidden">
+
+              <div class="section-title">
+                Law firm information
+              </div>
+
+              <div class="form-row">
+
+                <div class="form-group">
+
+                  <label for="firmName">
+                    Firm name
+                  </label>
+
+                  <input
+                    type="text"
+                    id="firmName"
+                    placeholder="Enter firm name">
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="firmRegistration">
+                    Registration details
+                  </label>
+
+                  <input
+                    type="text"
+                    id="firmRegistration"
+                    placeholder="Registration number">
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- PASSWORD -->
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label for="password">
+                  Password
+                </label>
+
+                <div class="password-input">
+
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Create a password"
+                    required>
+
+                  <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password">
+                    Show
+                  </button>
+
+                </div>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="confirmPassword">
+                  Confirm password
+                </label>
+
+                <div class="password-input">
+
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Repeat your password"
+                    required>
+
+                  <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="confirmPassword">
+                    Show
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- TERMS -->
+
+            <div class="terms">
+
+              <label>
+
+                <input
+                  type="checkbox"
+                  id="terms"
+                  required>
+
+                <span>
+                  I agree to the
+                  <a href="#">
+                    Terms of Service
+                  </a>
+                  and
+                  <a href="#">
+                    Privacy Policy
+                  </a>.
+                </span>
+
+              </label>
+
+            </div>
+
+            <!-- BUTTON -->
+
+            <button
+              type="submit"
+              class="register-button">
+
+              Create account
+
+              <span>→</span>
+
+            </button>
+
+            <div
+              id="registerMessage"
+              class="register-message"></div>
+
+          </form>
+
+          <!-- LOGIN -->
+
+          <div class="login-link">
+
+            <span>
+              Already have an account?
+            </span>
+
+            <a href="login.html">
+              Login
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <script type="module" src="../js/register.js"></script>
+
+  </body>
+
+</html>

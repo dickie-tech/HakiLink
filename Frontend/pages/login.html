@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | HakiLink</title>
+
+    <link rel="stylesheet" href="../styles/login.css">
+
+  </head>
+
+  <body>
+
+    <main class="login-page">
+
+      <!-- LEFT SIDE -->
+
+      <section class="login-visual">
+
+        <a href="../index.html" class="logo">
+
+          <span class="logo-icon">⚖</span>
+
+          <span>
+            Haki<span>Link</span>
+          </span>
+
+        </a>
+
+        <div class="visual-content">
+
+          <span class="eyebrow">
+            WELCOME BACK
+          </span>
+
+          <h1>
+            Legal help,
+            <span>connected.</span>
+          </h1>
+
+          <p>
+            Access your HakiLink account and
+            continue your legal journey.
+          </p>
+
+        </div>
+
+        <div class="visual-footer">
+
+          <span>
+            ⚖
+          </span>
+
+          <p>
+            Connecting people with legal
+            professionals.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- RIGHT SIDE -->
+
+      <section class="login-form-section">
+
+        <div class="login-container">
+
+          <div class="mobile-logo">
+
+            <a href="../index.html" class="logo">
+
+              <span class="logo-icon">⚖</span>
+
+              <span>
+                Haki<span>Link</span>
+              </span>
+
+            </a>
+
+          </div>
+
+          <div class="form-header">
+
+            <span class="eyebrow">
+              ACCOUNT LOGIN
+            </span>
+
+            <h2>
+              Welcome back
+            </h2>
+
+            <p>
+              Enter your details to access
+              your account.
+            </p>
+
+          </div>
+
+          <form id="loginForm">
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+              <label for="email">
+                Email address
+              </label>
+
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                required>
+
+            </div>
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+              <div class="password-label">
+
+                <label for="password">
+                  Password
+                </label>
+
+                <a href="forgot-password.html">
+                  Forgot password?
+                </a>
+
+              </div>
+
+              <div class="password-input">
+
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  required>
+
+                <button
+                  type="button"
+                  id="togglePassword"
+                  class="toggle-password">
+                  Show
+                </button>
+
+              </div>
+
+            </div>
+
+            <!-- REMEMBER -->
+
+            <div class="remember-row">
+
+              <label>
+
+                <input
+                  type="checkbox"
+                  id="remember">
+
+                <span>
+                  Remember me
+                </span>
+
+              </label>
+
+            </div>
+
+            <!-- LOGIN BUTTON -->
+
+            <button
+              type="submit"
+              class="login-button">
+
+              Login
+
+              <span>→</span>
+
+            </button>
+
+            <div
+              id="loginMessage"
+              class="login-message"></div>
+
+          </form>
+
+          <!-- REGISTER -->
+
+          <div class="register-link">
+
+            <span>
+              Don't have an account?
+            </span>
+
+            <a href="register.html">
+              Create an account
+            </a>
+
+          </div>
+
+          <!-- SECURITY -->
+
+          <div class="security-note">
+
+            <span>🔒</span>
+
+            <p>
+              Your information is protected
+              and kept secure.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <script type="module" src="../js/login.js"></script>
+
+  </body>
+
+</html>
