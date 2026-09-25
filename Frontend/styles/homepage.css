@@ -1,10 +1,4 @@
-/* =========================================================
-   HAKILINK
-   NAVY + GOLD LEGAL-TECH DESIGN SYSTEM
-========================================================= */
-
 :root {
-
     --navy: #0B2D52;
     --navy-dark: #061F36;
     --navy-light: #123F6B;
@@ -49,19 +43,34 @@ html {
 }
 
 body {
-
     font-family:
         Arial,
         Helvetica,
         sans-serif;
-
-    background: var(--background);
 
     color: var(--text-dark);
 
     line-height: 1.6;
 
     overflow-x: hidden;
+
+    position: relative;
+
+
+    background:
+        linear-gradient(
+            rgba(245, 247, 250, 0.60),
+            rgba(245, 247, 250, 0.60)
+        ),
+        url("../assets/lawyers-background.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-attachment: fixed;
+
+    background-repeat: no-repeat;
 }
 
 a {
@@ -79,7 +88,6 @@ button {
 ========================================================= */
 
 .navbar {
-
     width: 100%;
 
     height: 78px;
@@ -92,22 +100,23 @@ button {
 
     padding: 0 6%;
 
-    background: var(--navy);
+    background:
+        rgba(11, 45, 82, 0.97);
 
     border-bottom:
         1px solid
-        rgba(255,255,255,0.08);
+        rgba(255, 255, 255, 0.08);
 
     position: sticky;
 
     top: 0;
 
     z-index: 1000;
+
+    backdrop-filter: blur(12px);
 }
 
-
 .logo {
-
     display: flex;
 
     align-items: center;
@@ -121,14 +130,11 @@ button {
     font-weight: 800;
 }
 
-
 .logo > span:last-child span {
     color: var(--gold);
 }
 
-
 .logo-icon {
-
     width: 44px;
 
     height: 44px;
@@ -148,17 +154,13 @@ button {
     font-size: 23px;
 }
 
-
 .nav-links {
-
     display: flex;
 
     gap: 30px;
 }
 
-
 .nav-links a {
-
     color: var(--text-light);
 
     font-size: 14px;
@@ -168,14 +170,11 @@ button {
     transition: 0.3s;
 }
 
-
 .nav-links a:hover {
     color: var(--gold);
 }
 
-
 .nav-actions {
-
     display: flex;
 
     align-items: center;
@@ -183,9 +182,7 @@ button {
     gap: 18px;
 }
 
-
 .login-btn {
-
     color: var(--white);
 
     font-size: 14px;
@@ -195,14 +192,11 @@ button {
     transition: 0.3s;
 }
 
-
 .login-btn:hover {
     color: var(--gold);
 }
 
-
 .signup-btn {
-
     padding: 11px 20px;
 
     background: var(--gold);
@@ -218,9 +212,7 @@ button {
     transition: 0.3s;
 }
 
-
 .signup-btn:hover {
-
     background: var(--gold-light);
 
     transform: translateY(-2px);
@@ -232,7 +224,6 @@ button {
 ========================================================= */
 
 .hero {
-
     min-height: 700px;
 
     padding: 100px 7%;
@@ -247,17 +238,80 @@ button {
 
     gap: 70px;
 
+    position: relative;
+
+    overflow: hidden;
+
+    isolation: isolate;
+
+  
+    
     background: var(--navy);
 }
 
 
-.hero-content {
-    max-width: 650px;
+/*
+   Hero background image
+*/
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    inset: -50px;
+
+    background-image:
+        url("../assets/lawyers-background2.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    filter: blur(0px);
+
+    transform: scale(1.08);
+
+    opacity: 0.42;
+
+    z-index: -2;
 }
 
 
-.hero-badge {
+/*
+   Hero overlay
+*/
 
+.hero::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(6, 31, 54, 0.96) 0%,
+            rgba(11, 45, 82, 0.88) 42%,
+            rgba(11, 45, 82, 0.72) 72%,
+            rgba(6, 31, 54, 0.88) 100%
+        );
+
+    z-index: -1;
+
+    pointer-events: none;
+}
+
+.hero-content {
+    max-width: 650px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+.hero-badge {
     display: inline-block;
 
     padding: 8px 15px;
@@ -266,10 +320,10 @@ button {
 
     border:
         1px solid
-        rgba(217,169,40,0.35);
+        rgba(217, 169, 40, 0.35);
 
     background:
-        rgba(217,169,40,0.10);
+        rgba(217, 169, 40, 0.10);
 
     color: var(--gold);
 
@@ -278,11 +332,11 @@ button {
     font-size: 12px;
 
     font-weight: 800;
+
+    backdrop-filter: blur(8px);
 }
 
-
 .hero h1 {
-
     color: var(--white);
 
     font-size:
@@ -295,14 +349,11 @@ button {
     margin-bottom: 25px;
 }
 
-
 .hero h1 span {
     color: var(--gold);
 }
 
-
 .hero-content > p {
-
     max-width: 590px;
 
     color: var(--text-light);
@@ -314,9 +365,7 @@ button {
     margin-bottom: 35px;
 }
 
-
 .hero-buttons {
-
     display: flex;
 
     gap: 15px;
@@ -324,11 +373,9 @@ button {
     margin-bottom: 55px;
 }
 
-
 .primary-btn,
 .secondary-btn,
 .outline-btn {
-
     display: inline-block;
 
     padding: 14px 23px;
@@ -342,69 +389,59 @@ button {
     transition: 0.3s;
 }
 
-
 .primary-btn {
-
     background: var(--gold);
 
     color: var(--navy);
 }
 
-
 .primary-btn:hover {
-
     background: var(--gold-light);
 
     transform: translateY(-2px);
 }
 
-
 .secondary-btn {
-
-    background: transparent;
+    background:
+        rgba(255, 255, 255, 0.06);
 
     color: var(--white);
 
     border:
         1px solid
-        rgba(255,255,255,0.25);
+        rgba(255, 255, 255, 0.30);
+
+    backdrop-filter: blur(8px);
 }
 
-
 .secondary-btn:hover {
-
     border-color: var(--gold);
 
     color: var(--gold);
+
+    background:
+        rgba(217, 169, 40, 0.08);
 }
 
-
 .hero-trust {
-
     display: flex;
 
     gap: 40px;
 }
 
-
 .trust-item {
-
     display: flex;
 
     flex-direction: column;
 }
 
-
 .trust-item strong {
-
     color: var(--white);
 
     font-size: 18px;
 }
 
-
 .trust-item span {
-
     color: var(--text-light);
 
     font-size: 11px;
@@ -416,7 +453,6 @@ button {
 ========================================================= */
 
 .hero-visual {
-
     position: relative;
 
     min-height: 480px;
@@ -426,11 +462,11 @@ button {
     align-items: center;
 
     justify-content: center;
+
+    z-index: 2;
 }
 
-
 .hero-image-container {
-
     width: 100%;
 
     max-width: 520px;
@@ -445,16 +481,14 @@ button {
 
     border:
         1px solid
-        rgba(255,255,255,0.15);
+        rgba(255, 255, 255, 0.18);
 
     box-shadow:
         0 30px 80px
-        rgba(0,0,0,0.30);
+        rgba(0, 0, 0, 0.40);
 }
 
-
 .hero-image {
-
     width: 100%;
 
     height: 100%;
@@ -462,11 +496,16 @@ button {
     object-fit: cover;
 
     display: block;
+
+    transition:
+        transform 0.6s ease;
 }
 
+.hero-image-container:hover .hero-image {
+    transform: scale(1.03);
+}
 
 .hero-image-overlay {
-
     position: absolute;
 
     inset: 0;
@@ -474,14 +513,12 @@ button {
     background:
         linear-gradient(
             to top,
-            rgba(6,31,54,0.85),
+            rgba(6, 31, 54, 0.88),
             transparent 55%
         );
 }
 
-
 .hero-image-caption {
-
     position: absolute;
 
     bottom: 25px;
@@ -499,9 +536,7 @@ button {
     color: var(--white);
 }
 
-
 .caption-icon {
-
     width: 40px;
 
     height: 40px;
@@ -521,22 +556,17 @@ button {
     font-weight: 900;
 }
 
-
 .hero-image-caption div {
-
     display: flex;
 
     flex-direction: column;
 }
 
-
 .hero-image-caption strong {
     font-size: 14px;
 }
 
-
 .hero-image-caption small {
-
     color: var(--text-light);
 
     font-size: 11px;
@@ -548,7 +578,6 @@ button {
 ========================================================= */
 
 .floating-card {
-
     position: absolute;
 
     display: flex;
@@ -559,34 +588,31 @@ button {
 
     padding: 14px 17px;
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.94);
 
     border-radius: 11px;
 
     box-shadow: var(--shadow);
 
     z-index: 3;
+
+    backdrop-filter: blur(10px);
 }
 
-
 .floating-one {
-
     top: 45px;
 
     right: -25px;
 }
 
-
 .floating-two {
-
     bottom: 40px;
 
     left: -25px;
 }
 
-
 .floating-icon {
-
     width: 38px;
 
     height: 38px;
@@ -604,25 +630,19 @@ button {
     border-radius: 8px;
 }
 
-
 .floating-card div:last-child {
-
     display: flex;
 
     flex-direction: column;
 }
 
-
 .floating-card strong {
-
     color: var(--text-dark);
 
     font-size: 12px;
 }
 
-
 .floating-card small {
-
     color: var(--text-medium);
 
     font-size: 10px;
@@ -634,7 +654,6 @@ button {
 ========================================================= */
 
 .connection-section {
-
     padding: 110px 7%;
 
     display: grid;
@@ -647,18 +666,32 @@ button {
 
     align-items: center;
 
-    background: var(--white);
+    /*
+       LOWER OPACITY = BACKGROUND IMAGE SHOWS
+    */
+    background:
+        rgba(255, 255, 255, 0.58);
+
+    backdrop-filter: blur(8px);
+
+    position: relative;
+
+    z-index: 2;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.55);
+
+    border-bottom:
+        1px solid
+        rgba(220, 227, 234, 0.6);
 }
 
-
 .connection-content {
-
     max-width: 500px;
 }
 
-
 .section-label {
-
     color: var(--gold-dark);
 
     font-size: 11px;
@@ -668,9 +701,7 @@ button {
     letter-spacing: 1.7px;
 }
 
-
 .connection-content h2 {
-
     color: var(--navy);
 
     font-size: 43px;
@@ -680,23 +711,17 @@ button {
     margin: 14px 0 20px;
 }
 
-
 .connection-content h2 span {
-
     color: var(--gold-dark);
 }
 
-
 .connection-content p {
-
     color: var(--text-medium);
 
     margin-bottom: 28px;
 }
 
-
 .outline-btn {
-
     border:
         1px solid
         var(--navy);
@@ -704,9 +729,7 @@ button {
     color: var(--navy);
 }
 
-
 .outline-btn:hover {
-
     background: var(--navy);
 
     color: var(--white);
@@ -718,7 +741,6 @@ button {
 ========================================================= */
 
 .connection-media {
-
     height: 420px;
 
     position: relative;
@@ -732,9 +754,7 @@ button {
     box-shadow: var(--shadow);
 }
 
-
 .connection-video {
-
     width: 100%;
 
     height: 100%;
@@ -744,9 +764,7 @@ button {
     display: block;
 }
 
-
 .video-overlay {
-
     position: absolute;
 
     inset: 0;
@@ -763,16 +781,14 @@ button {
 
     background:
         linear-gradient(
-            rgba(8,39,68,0.25),
-            rgba(8,39,68,0.65)
+            rgba(8, 39, 68, 0.25),
+            rgba(8, 39, 68, 0.65)
         );
 
     color: var(--white);
 }
 
-
 .play-badge {
-
     width: 70px;
 
     height: 70px;
@@ -792,9 +808,7 @@ button {
     font-size: 22px;
 }
 
-
 .video-overlay span {
-
     font-size: 15px;
 
     font-weight: 700;
@@ -806,7 +820,6 @@ button {
 ========================================================= */
 
 .section-heading {
-
     max-width: 680px;
 
     margin: 0 auto 60px;
@@ -814,9 +827,7 @@ button {
     text-align: center;
 }
 
-
 .section-heading h2 {
-
     color: var(--navy);
 
     font-size: 42px;
@@ -828,11 +839,9 @@ button {
     letter-spacing: -1px;
 }
 
-
 .section-heading h2 span {
     color: var(--gold-dark);
 }
-
 
 .section-heading p {
     color: var(--text-medium);
@@ -844,15 +853,22 @@ button {
 ========================================================= */
 
 .how-it-works {
-
     padding: 110px 7%;
 
-    background: var(--background);
+    /*
+       More transparent so the image is visible
+    */
+    background:
+        rgba(245, 247, 250, 0.55);
+
+    backdrop-filter: blur(8px);
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .steps {
-
     max-width: 1100px;
 
     margin: auto;
@@ -865,25 +881,24 @@ button {
     gap: 25px;
 }
 
-
 .step-card {
-
     padding: 32px;
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.78);
 
     border:
         1px solid
-        var(--border);
+        rgba(220, 227, 234, 0.85);
 
     border-radius: 14px;
 
     transition: 0.3s;
+
+    backdrop-filter: blur(10px);
 }
 
-
 .step-card:hover {
-
     transform: translateY(-6px);
 
     border-color: var(--gold);
@@ -891,9 +906,7 @@ button {
     box-shadow: var(--shadow-small);
 }
 
-
 .step-number {
-
     color: var(--gold-dark);
 
     font-size: 13px;
@@ -901,9 +914,7 @@ button {
     font-weight: 900;
 }
 
-
 .step-icon {
-
     width: 55px;
 
     height: 55px;
@@ -923,17 +934,13 @@ button {
     font-size: 24px;
 }
 
-
 .step-card h3 {
-
     color: var(--navy);
 
     margin-bottom: 10px;
 }
 
-
 .step-card p {
-
     color: var(--text-medium);
 
     font-size: 14px;
@@ -945,15 +952,19 @@ button {
 ========================================================= */
 
 .lawyers-section {
-
     padding: 110px 7%;
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.58);
+
+    backdrop-filter: blur(8px);
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .lawyer-grid {
-
     max-width: 1100px;
 
     margin: auto;
@@ -966,12 +977,11 @@ button {
     gap: 25px;
 }
 
-
 .lawyer-card {
-
     overflow: hidden;
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.82);
 
     border:
         1px solid
@@ -980,19 +990,21 @@ button {
     border-radius: 15px;
 
     transition: 0.3s;
+
+    box-shadow:
+        0 8px 25px
+        rgba(8, 39, 68, 0.08);
+
+    backdrop-filter: blur(10px);
 }
 
-
 .lawyer-card:hover {
-
     transform: translateY(-7px);
 
     box-shadow: var(--shadow);
 }
 
-
 .lawyer-image {
-
     height: 270px;
 
     position: relative;
@@ -1002,9 +1014,7 @@ button {
     background: var(--soft-blue);
 }
 
-
 .lawyer-image img {
-
     width: 100%;
 
     height: 100%;
@@ -1014,15 +1024,11 @@ button {
     transition: 0.5s;
 }
 
-
 .lawyer-card:hover .lawyer-image img {
-
     transform: scale(1.05);
 }
 
-
 .verified-badge {
-
     position: absolute;
 
     top: 15px;
@@ -1042,15 +1048,11 @@ button {
     font-weight: 900;
 }
 
-
 .lawyer-info {
-
     padding: 22px;
 }
 
-
 .lawyer-location {
-
     color: var(--gold-dark);
 
     font-size: 10px;
@@ -1064,9 +1066,7 @@ button {
     margin-bottom: 7px;
 }
 
-
 .lawyer-info h3 {
-
     color: var(--navy);
 
     font-size: 18px;
@@ -1074,17 +1074,13 @@ button {
     margin-bottom: 4px;
 }
 
-
 .lawyer-info p {
-
     color: var(--text-medium);
 
     font-size: 13px;
 }
 
-
 .lawyer-footer {
-
     margin-top: 20px;
 
     padding-top: 15px;
@@ -1100,17 +1096,13 @@ button {
     justify-content: space-between;
 }
 
-
 .lawyer-footer span {
-
     color: var(--text-medium);
 
     font-size: 10px;
 }
 
-
 .lawyer-footer a {
-
     color: var(--navy);
 
     font-size: 12px;
@@ -1118,14 +1110,11 @@ button {
     font-weight: 800;
 }
 
-
 .lawyer-footer a:hover {
     color: var(--gold-dark);
 }
 
-
 .center-button {
-
     margin-top: 45px;
 
     text-align: center;
@@ -1137,7 +1126,6 @@ button {
 ========================================================= */
 
 .law-firm-section {
-
     padding: 110px 7%;
 
     display: grid;
@@ -1150,12 +1138,17 @@ button {
 
     align-items: center;
 
-    background: var(--soft-blue);
+    background:
+        rgba(237, 242, 247, 0.58);
+
+    backdrop-filter: blur(8px);
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .law-firm-image {
-
     height: 500px;
 
     overflow: hidden;
@@ -1165,9 +1158,7 @@ button {
     box-shadow: var(--shadow);
 }
 
-
 .law-firm-image img {
-
     width: 100%;
 
     height: 100%;
@@ -1175,15 +1166,11 @@ button {
     object-fit: cover;
 }
 
-
 .law-firm-content {
-
     max-width: 520px;
 }
 
-
 .law-firm-content h2 {
-
     color: var(--navy);
 
     font-size: 43px;
@@ -1193,23 +1180,17 @@ button {
     margin: 14px 0 20px;
 }
 
-
 .law-firm-content h2 span {
-
     color: var(--gold-dark);
 }
 
-
 .law-firm-content > p {
-
     color: var(--text-medium);
 
     margin-bottom: 25px;
 }
 
-
 .firm-points {
-
     display: flex;
 
     flex-direction: column;
@@ -1219,9 +1200,7 @@ button {
     margin-bottom: 30px;
 }
 
-
 .firm-points div {
-
     display: flex;
 
     align-items: center;
@@ -1235,9 +1214,7 @@ button {
     font-weight: 600;
 }
 
-
 .firm-points span {
-
     width: 25px;
 
     height: 25px;
@@ -1263,15 +1240,19 @@ button {
 ========================================================= */
 
 .resources-section {
-
     padding: 110px 7%;
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.58);
+
+    backdrop-filter: blur(8px);
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .resource-grid {
-
     max-width: 1100px;
 
     margin: auto;
@@ -1285,9 +1266,7 @@ button {
     gap: 25px;
 }
 
-
 .resource-card {
-
     min-height: 350px;
 
     overflow: hidden;
@@ -1298,20 +1277,19 @@ button {
         1px solid
         var(--border);
 
-    background: var(--white);
+    background:
+        rgba(255, 255, 255, 0.82);
+
+    backdrop-filter: blur(10px);
 }
 
-
 .resource-image {
-
     height: 210px;
 
     overflow: hidden;
 }
 
-
 .resource-image img {
-
     width: 100%;
 
     height: 100%;
@@ -1319,15 +1297,11 @@ button {
     object-fit: cover;
 }
 
-
 .resource-content {
-
     padding: 25px;
 }
 
-
 .resource-content > span {
-
     color: var(--gold-dark);
 
     font-size: 10px;
@@ -1337,9 +1311,7 @@ button {
     letter-spacing: 1px;
 }
 
-
 .resource-content h3 {
-
     color: var(--navy);
 
     font-size: 21px;
@@ -1347,9 +1319,7 @@ button {
     margin: 8px 0 15px;
 }
 
-
 .resource-content p {
-
     color: var(--text-medium);
 
     font-size: 13px;
@@ -1357,9 +1327,7 @@ button {
     margin-bottom: 20px;
 }
 
-
 .resource-content a {
-
     color: var(--navy);
 
     font-size: 12px;
@@ -1367,9 +1335,7 @@ button {
     font-weight: 900;
 }
 
-
 .resource-text {
-
     min-height: 350px;
 
     display: flex;
@@ -1379,19 +1345,15 @@ button {
     justify-content: center;
 
     background: var(--navy);
-
 }
-
 
 .resource-text h3 {
     color: var(--white);
 }
 
-
 .resource-text p {
     color: var(--text-light);
 }
-
 
 .resource-text a {
     color: var(--gold);
@@ -1403,7 +1365,6 @@ button {
 ========================================================= */
 
 .ai-section {
-
     padding: 110px 7%;
 
     display: grid;
@@ -1417,17 +1378,17 @@ button {
     align-items: center;
 
     background: var(--navy);
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .ai-content {
-
     max-width: 650px;
 }
 
-
 .ai-icon {
-
     width: 60px;
 
     height: 60px;
@@ -1449,14 +1410,11 @@ button {
     font-size: 25px;
 }
 
-
 .ai-section .section-label {
     color: var(--gold);
 }
 
-
 .ai-section h2 {
-
     color: var(--white);
 
     font-size: 48px;
@@ -1466,14 +1424,11 @@ button {
     margin: 15px 0 20px;
 }
 
-
 .ai-section h2 span {
     color: var(--gold);
 }
 
-
 .ai-section p {
-
     color: var(--text-light);
 
     max-width: 570px;
@@ -1481,9 +1436,7 @@ button {
     margin-bottom: 30px;
 }
 
-
 .ai-button {
-
     padding: 14px 23px;
 
     border: none;
@@ -1501,17 +1454,13 @@ button {
     transition: 0.3s;
 }
 
-
 .ai-button:hover {
-
     background: var(--gold-light);
 
     transform: translateY(-2px);
 }
 
-
 .ai-decoration {
-
     min-height: 320px;
 
     position: relative;
@@ -1523,9 +1472,7 @@ button {
     justify-content: center;
 }
 
-
 .ai-message {
-
     width: 320px;
 
     padding: 20px;
@@ -1542,12 +1489,10 @@ button {
 
     box-shadow:
         0 20px 50px
-        rgba(0,0,0,0.2);
+        rgba(0, 0, 0, 0.2);
 }
 
-
 .ai-message > span {
-
     min-width: 40px;
 
     height: 40px;
@@ -1569,9 +1514,7 @@ button {
     font-weight: 900;
 }
 
-
 .ai-message p {
-
     margin: 0;
 
     color: var(--text-dark);
@@ -1579,9 +1522,7 @@ button {
     font-size: 13px;
 }
 
-
 .second-message {
-
     position: absolute;
 
     right: 0;
@@ -1595,7 +1536,6 @@ button {
 ========================================================= */
 
 .cta {
-
     padding: 110px 7%;
 
     background:
@@ -1606,24 +1546,23 @@ button {
         );
 
     text-align: center;
+
+    position: relative;
+
+    z-index: 2;
 }
 
-
 .cta-content {
-
     max-width: 750px;
 
     margin: auto;
 }
 
-
 .cta .section-label {
     color: var(--gold);
 }
 
-
 .cta h2 {
-
     color: var(--white);
 
     font-size: 50px;
@@ -1633,14 +1572,11 @@ button {
     margin: 15px 0 20px;
 }
 
-
 .cta h2 span {
     color: var(--gold);
 }
 
-
 .cta p {
-
     max-width: 600px;
 
     margin: 0 auto 30px;
@@ -1648,9 +1584,7 @@ button {
     color: var(--text-light);
 }
 
-
 .cta-buttons {
-
     display: flex;
 
     justify-content: center;
@@ -1660,16 +1594,13 @@ button {
     gap: 25px;
 }
 
-
 .cta-link {
-
     color: var(--white);
 
     font-size: 14px;
 
     font-weight: 700;
 }
-
 
 .cta-link:hover {
     color: var(--gold);
@@ -1681,17 +1612,18 @@ button {
 ========================================================= */
 
 footer {
-
     padding: 60px 7% 25px;
 
-    background: #061F36;
+    background: var(--navy-dark);
 
     color: var(--white);
+
+    position: relative;
+
+    z-index: 10;
 }
 
-
 .footer-main {
-
     max-width: var(--container);
 
     margin: auto;
@@ -1707,9 +1639,7 @@ footer {
     gap: 50px;
 }
 
-
 .footer-logo {
-
     display: flex;
 
     align-items: center;
@@ -1723,14 +1653,11 @@ footer {
     margin-bottom: 12px;
 }
 
-
 .footer-logo span {
     color: var(--gold);
 }
 
-
 .footer-brand p {
-
     max-width: 250px;
 
     color: var(--text-light);
@@ -1738,9 +1665,7 @@ footer {
     font-size: 13px;
 }
 
-
 .footer-column {
-
     display: flex;
 
     flex-direction: column;
@@ -1748,9 +1673,7 @@ footer {
     gap: 10px;
 }
 
-
 .footer-column h4 {
-
     color: var(--gold);
 
     font-size: 12px;
@@ -1758,9 +1681,7 @@ footer {
     margin-bottom: 8px;
 }
 
-
 .footer-column a {
-
     color: var(--text-light);
 
     font-size: 12px;
@@ -1768,14 +1689,11 @@ footer {
     transition: 0.3s;
 }
 
-
 .footer-column a:hover {
     color: var(--gold);
 }
 
-
 .footer-bottom {
-
     max-width: var(--container);
 
     margin: 50px auto 0;
@@ -1784,7 +1702,7 @@ footer {
 
     border-top:
         1px solid
-        rgba(255,255,255,0.1);
+        rgba(255, 255, 255, 0.1);
 
     display: flex;
 
@@ -1806,191 +1724,177 @@ footer {
         display: none;
     }
 
-
     .hero {
-
         grid-template-columns: 1fr;
 
         text-align: center;
-    }
 
+        min-height: auto;
+    }
 
     .hero-content {
         margin: auto;
     }
 
+    .hero-content > p {
+        margin-left: auto;
+
+        margin-right: auto;
+    }
 
     .hero-buttons,
     .hero-trust {
-
         justify-content: center;
     }
 
-
     .hero-visual {
-
         margin-top: 20px;
     }
-
 
     .connection-section,
     .law-firm-section,
     .ai-section {
-
         grid-template-columns: 1fr;
     }
 
-
     .connection-content,
     .law-firm-content {
-
         max-width: 700px;
 
         margin: auto;
     }
 
-
     .lawyer-grid {
-
         grid-template-columns:
             repeat(2, 1fr);
     }
-
 
     .footer-main {
-
         grid-template-columns:
             repeat(2, 1fr);
     }
-
 }
 
 
 @media (max-width: 650px) {
 
+    body {
+        background-attachment: scroll;
+
+        background:
+            linear-gradient(
+                rgba(245, 247, 250, 0.78),
+                rgba(245, 247, 250, 0.78)
+            ),
+            url("../assets/hero-lawyers.jpg");
+
+        background-size: cover;
+
+        background-position: center;
+    }
+
     .navbar {
         padding: 0 5%;
     }
-
 
     .nav-actions .login-btn {
         display: none;
     }
 
-
     .hero {
-
         padding: 70px 5%;
     }
 
+    .hero::before {
+        filter: blur(9px);
+
+        opacity: 0.25;
+    }
+
+    .hero::after {
+        background:
+            linear-gradient(
+                rgba(6, 31, 54, 0.94),
+                rgba(11, 45, 82, 0.92)
+            );
+    }
 
     .hero h1 {
-
         font-size: 48px;
 
         letter-spacing: -2px;
     }
 
-
     .hero-buttons {
-
         flex-direction: column;
     }
 
-
     .primary-btn,
     .secondary-btn {
-
         width: 100%;
 
         text-align: center;
     }
 
-
     .hero-trust {
-
         gap: 18px;
     }
 
-
     .hero-image-container {
-
         height: 400px;
     }
-
 
     .floating-card {
         display: none;
     }
 
-
     .steps,
     .lawyer-grid,
     .resource-grid {
-
         grid-template-columns: 1fr;
     }
-
 
     .connection-section,
     .law-firm-section,
     .ai-section {
-
         padding: 80px 5%;
     }
-
 
     .connection-content h2,
     .law-firm-content h2,
     .ai-section h2 {
-
         font-size: 36px;
     }
 
-
     .section-heading h2 {
-
         font-size: 35px;
     }
 
-
     .law-firm-image {
-
         height: 350px;
     }
 
-
     .cta {
-
         padding: 80px 5%;
     }
 
-
     .cta h2 {
-
         font-size: 38px;
     }
 
-
     .cta-buttons {
-
         flex-direction: column;
     }
 
-
     .footer-main {
-
         grid-template-columns: 1fr;
     }
 
-
     .footer-bottom {
-
         flex-direction: column;
 
         gap: 10px;
 
         text-align: center;
     }
-
 }
