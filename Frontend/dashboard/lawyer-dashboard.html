@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B2D52">
+    <link rel="icon" type="image/png" href="../assets/hakilink-logo.jpg">
+
+    <title>Lawyer Dashboard | HakiLink</title>
+
+    <link rel="stylesheet" href="../styles/lawyer-dashboard.css">
+  </head>
+
+  <body>
+    <div class="app-layout">
+
+      <aside class="sidebar" id="sidebar">
+        <a href="../index.html" class="brand">
+          <span class="logo-icon">
+            <img src="../assets/law-icon.png" alt="HakiLink Logo">
+          </span>
+          <span>Haki<span class="gold-text">Link</span></span>
+        </a>
+
+        <div class="sidebar-label">WORKSPACE</div>
+
+        <nav class="navigation">
+          <button class="nav-link active" data-section="overview">
+            <span class="nav-icon">
+              <img src="../assets/hakilink2logo.jpg" alt="Dashboard">
+            </span> Overview
+          </button>
+          <button class="nav-link" data-section="requests">
+            <span class="nav-icon">
+              <img src="../assets/notes.png" alt="Requests">
+            </span> Client Requests
+            <span class="nav-count" id="requestNavCount">0</span>
+          </button>
+          <button class="nav-link" data-section="appointments">
+            <span>▦</span> Appointments
+          </button>
+          <button class="nav-link" data-section="messages">
+            <div class="nav-icon">
+              <img src="../assets/messages.png" alt="Messages">
+            </div> Messages
+            <span class="nav-count" id="messageNavCount">0</span>
+          </button>
+          <button class="nav-link" data-section="profile">
+            <div class="nav-icon">
+              <img src="../assets/profile2.png" alt="Profile">
+            </div> Professional Profile
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-help">
+            <div class="help-icon">?</div>
+            <strong>Need assistance?</strong>
+            <p>Manage your legal practice with HakiLink.</p>
+          </div>
+
+          <button id="logoutButton" class="logout-button">
+            <span>↪</span> Sign out
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <button id="menuButton" class="menu-button"
+            aria-label="Toggle navigation">☰</button>
+
+          <div>
+            <p class="topbar-eyebrow">LAWYER WORKSPACE</p>
+            <h2 id="pageTitle">Overview</h2>
+          </div>
+
+          <div class="topbar-user">
+            <div class="avatar" id="userAvatar">HL</div>
+            <div class="topbar-user-info">
+              <strong id="topbarUserName">Loading...</strong>
+              <span>Lawyer account</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <div id="pageMessage" class="page-message" role="status"
+            aria-live="polite" hidden></div>
+
+          <!-- OVERVIEW -->
+          <section class="dashboard-section active" id="overview">
+            <div class="welcome-panel">
+              <div>
+                <p class="eyebrow">YOUR LEGAL WORKSPACE</p>
+                <h1>Welcome back, <span id="welcomeName">Counsel</span></h1>
+                <p>Manage your client enquiries, consultations and professional
+                  profile.</p>
+              </div>
+              <div class="stat-icon">
+                <img src="../assets/lawyers.jpg" alt="Lawyer">
+              </div>
+            </div>
+
+            <div class="stat-grid">
+              <article class="stat-card">
+                <div class="stat-icon">
+                  <img src="../assets/notes.png" alt="Requests">
+                </div>
+                <p>Pending Requests</p>
+                <strong id="pendingRequestsCount">0</strong>
+                <span>Awaiting your response</span>
+              </article>
+
+              <article class="stat-card">
+                <div class="stat-icon">
+                  <img src="../assets/consultations.png" alt="Consultations">
+                </div>
+                <p>Upcoming Consultations</p>
+                <strong id="upcomingAppointmentsCount">0</strong>
+                <span>Scheduled appointments</span>
+              </article>
+
+              <article class="stat-card">
+                <div class="stat-icon">
+                  <img src="../assets/messages.png" alt="Messages">
+                </div>
+                <p>Conversations</p>
+                <strong id="conversationsCount">0</strong>
+                <span>Client message threads</span>
+              </article>
+            </div>
+
+            <div class="content-card">
+              <div class="card-heading">
+                <div>
+                  <h3>Recent Client Requests</h3>
+                  <p>Review enquiries from potential clients.</p>
+                </div>
+                <button class="text-button" data-section="requests">
+                  View all →
+                </button>
+              </div>
+              <div id="recentRequests" class="data-list">
+                <p class="empty-state">Loading requests...</p>
+              </div>
+            </div>
+
+            <div class="content-card">
+              <div class="card-heading">
+                <div>
+                  <h3>Upcoming Consultations</h3>
+                  <p>Your next scheduled client appointments.</p>
+                </div>
+                <button class="text-button" data-section="appointments">
+                  View calendar →
+                </button>
+              </div>
+              <div id="recentAppointments" class="data-list">
+                <p class="empty-state">Loading appointments...</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- CLIENT REQUESTS -->
+          <section class="dashboard-section" id="requests">
+            <div class="section-intro">
+              <p class="eyebrow">CLIENT MANAGEMENT</p>
+              <h1>Client Requests</h1>
+              <p>Review consultation enquiries and respond to clients.</p>
+            </div>
+
+            <div class="toolbar">
+              <input type="search" id="requestSearch"
+                placeholder="Search client or subject..."
+                aria-label="Search client requests">
+
+              <select id="requestStatusFilter" aria-label="Filter requests">
+                <option value>All requests</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+
+            <div class="content-card">
+              <div id="requestsList" class="data-list">
+                <p class="empty-state">Loading requests...</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- APPOINTMENTS -->
+          <section class="dashboard-section" id="appointments">
+            <div class="section-intro">
+              <p class="eyebrow">YOUR SCHEDULE</p>
+              <h1>Appointments & Consultations</h1>
+              <p>Review the consultations assigned to your account.</p>
+            </div>
+
+            <div class="toolbar">
+              <input type="search" id="appointmentSearch"
+                placeholder="Search appointments..."
+                aria-label="Search appointments">
+
+              <select id="appointmentStatusFilter"
+                aria-label="Filter appointments">
+                <option value>All statuses</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div class="content-card">
+              <div id="appointmentsList" class="data-list">
+                <p class="empty-state">Loading appointments...</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- MESSAGES -->
+          <section class="dashboard-section" id="messages">
+            <div class="section-intro">
+              <p class="eyebrow">CLIENT COMMUNICATION</p>
+              <h1>Messages</h1>
+              <p>Communicate with clients through your HakiLink inbox.</p>
+            </div>
+
+            <div class="messages-layout">
+              <div class="conversation-panel">
+                <div class="conversation-header">
+                  <h3>Conversations</h3>
+                </div>
+                <div id="conversationsList">
+                  <p class="empty-state">Loading conversations...</p>
+                </div>
+              </div>
+
+              <div class="chat-panel">
+                <div class="chat-header" id="chatHeader">
+                  <div class="avatar">✉</div>
+                  <div>
+                    <strong>Select a conversation</strong>
+                    <span>Your client messages will appear here.</span>
+                  </div>
+                </div>
+
+                <div id="messagesList" class="messages-list">
+                  <p class="empty-state">Choose a conversation to view
+                    messages.</p>
+                </div>
+
+                <form id="messageForm" class="message-form">
+                  <input type="text" id="messageInput"
+                    placeholder="Write a message..."
+                    maxlength="4000" autocomplete="off"
+                    aria-label="Write a message" disabled required>
+                  <button type="submit" id="sendMessageButton" disabled>
+                    Send →
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- PROFESSIONAL PROFILE -->
+          <section class="dashboard-section" id="profile">
+            <div class="section-intro">
+              <p class="eyebrow">YOUR PROFESSIONAL IDENTITY</p>
+              <h1>Professional Profile</h1>
+              <p>Keep your professional details accurate and up to date.</p>
+            </div>
+
+            <div class="profile-layout">
+              <div class="profile-summary content-card">
+                <div class="large-avatar" id="profileAvatar">HL</div>
+                <h2 id="profileName">Loading profile...</h2>
+                <p id="profilePracticeArea">Practice area not set</p>
+                <span class="profile-role">Lawyer account</span>
+                <p class="profile-note">
+                  Changes to professional credentials do not constitute
+                  independent verification by HakiLink.
+                </p>
+              </div>
+
+              <div class="content-card profile-form-card">
+                <div class="card-heading">
+                  <div>
+                    <h3>Edit Professional Details</h3>
+                    <p>Your email address is managed by your account.</p>
+                  </div>
+                </div>
+
+                <form id="profileForm" class="profile-form">
+                  <div class="form-field">
+                    <label for="profileFullName">Full name</label>
+                    <input id="profileFullName" type="text"
+                      maxlength="120" required>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="profileEmail">Email address</label>
+                    <input id="profileEmail" type="email" disabled>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="profilePhone">Phone number</label>
+                    <input id="profilePhone" type="tel"
+                      maxlength="30" required>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="profilePracticeArea">Practice area</label>
+                    <select id="profilePracticeArea" required>
+                      <option value>Select practice area</option>
+                      <option>Criminal Law</option>
+                      <option>Family Law</option>
+                      <option>Corporate Law</option>
+                      <option>Property Law</option>
+                      <option>Employment Law</option>
+                      <option>Constitutional Law</option>
+                      <option>Commercial Law</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field full-width">
+                    <label for="profileBarNumber">Bar admission number</label>
+                    <input id="profileBarNumber" type="text"
+                      maxlength="100" required>
+                  </div>
+
+                  <div class="form-actions full-width">
+                    <button type="submit" id="saveProfileButton"
+                      class="primary-button">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <footer class="page-footer">
+            <span>© 2026 HakiLink</span>
+            <span>Connecting people with legal professionals.</span>
+          </footer>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="../js/lawyer-dashboard.js"></script>
+  </body>
+</html>
