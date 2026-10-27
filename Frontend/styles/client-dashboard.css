@@ -136,6 +136,12 @@ a {
 
     font-size: 18px;
 }
+.logo-icon img {
+    width: 24px;
+    height: 24px;
+
+    object-fit: contain;
+}
 
 
 /* ============================================
@@ -342,6 +348,13 @@ a {
     font-size: 17px;
 
     cursor: pointer;
+}
+.notification-button img {
+    width: 40px;
+    height: 70px;
+    margin-top: -10px;
+
+    object-fit: contain;
 }
 
 .notification-button:hover {
@@ -604,7 +617,22 @@ a {
 
     font-size: 19px;
 }
+.nav-icon,
+.stat-icon img {
+    width: 40px;
+    height: 26px;
 
+    object-fit: cover;
+}
+.empty-icon img{
+    height: 30px;
+    width: 40px;
+}
+
+.ai-circle img{
+    height: 70px;
+    width: 80px;
+}
 .stat-card span {
     display: block;
 

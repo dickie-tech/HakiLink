@@ -607,7 +607,7 @@ button {
 }
 
 .floating-two {
-    bottom: 40px;
+    bottom: 75px;
 
     left: -25px;
 }
@@ -814,6 +814,15 @@ button {
     font-weight: 700;
 }
 
+ .logo-icon img{
+    height: 40px;
+    width: 30px;
+}
+ .floating-icon img{
+    height: 40px;
+    width: 30px;
+}
+ 
 
 /* =========================================================
    SECTION HEADING
@@ -932,6 +941,13 @@ button {
     border-radius: 11px;
 
     font-size: 24px;
+}
+.step-icon img {
+    width: 60px;
+
+    height: 50px;
+
+    object-fit: contain;
 }
 
 .step-card h3 {
