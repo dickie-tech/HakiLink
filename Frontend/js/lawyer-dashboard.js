@@ -21,7 +21,8 @@ import {
     where,
     orderBy,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    Timestamp
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -383,6 +384,7 @@ async function loadRequests() {
     }
 }
 
+
 function createRequestItem(request, compact = false) {
     const item = element("article", "data-item");
     const main = element("div", "data-item-main");
@@ -414,22 +416,165 @@ function createRequestItem(request, compact = false) {
     main.appendChild(makeStatus(status));
 
     if (!compact && status === "pending") {
+        // Inline feedback field
+        const feedbackGroup = element("div", "feedback-group");
+
+        const feedbackLabel = element(
+            "label",
+            "feedback-label",
+            "Feedback for client (optional)"
+        );
+
+        const feedbackInput = element("textarea", "feedback-input");
+        feedbackInput.placeholder =
+            "Write a message to explain your decision...";
+        feedbackInput.rows = 3;
+        feedbackInput.maxLength = 1000;
+
+        feedbackLabel.htmlFor = `feedback-${request.id}`;
+        feedbackInput.id = `feedback-${request.id}`;
+
+        feedbackGroup.append(feedbackLabel, feedbackInput);
+        main.appendChild(feedbackGroup);
+
+        // Accept and Decline buttons
         const actions = element("div", "item-actions");
 
-        const acceptButton = element("button", "small-button accept", "Accept");
+        const acceptButton = element(
+            "button",
+            "small-button accept",
+            "Accept"
+        );
         acceptButton.type = "button";
+
         acceptButton.addEventListener("click", () => {
-            updateRequestStatus(request.id, "accepted", acceptButton);
+            updateRequestStatus(
+                request.id,
+                "accepted",
+                acceptButton,
+                feedbackInput.value
+            );
         });
 
-        const declineButton = element("button", "small-button decline", "Decline");
+        const declineButton = element(
+            "button",
+            "small-button decline",
+            "Decline"
+        );
         declineButton.type = "button";
+
         declineButton.addEventListener("click", () => {
-            updateRequestStatus(request.id, "declined", declineButton);
+            updateRequestStatus(
+                request.id,
+                "declined",
+                declineButton,
+                feedbackInput.value
+            );
         });
 
         actions.append(acceptButton, declineButton);
         main.appendChild(actions);
+    }
+    
+    // Allow lawyers to schedule appointments for accepted requests.
+    if (!compact && normaliseStatus(request.status) === "accepted") {
+        const existingAppointment = appointments.find(
+            (appointment) => appointment.requestId === request.id
+        );
+
+        if (existingAppointment) {
+            const scheduledInfo = element(
+                "div",
+                "saved-feedback"
+            );
+
+            scheduledInfo.appendChild(
+                element("strong", "", "Appointment scheduled")
+            );
+
+            scheduledInfo.appendChild(
+                element(
+                    "p",
+                    "",
+                    formatDate(existingAppointment.dateTime)
+                )
+            );
+
+            main.appendChild(scheduledInfo);
+
+        } else {
+            const scheduleGroup = element("div", "feedback-group");
+
+            scheduleGroup.appendChild(
+                element("h4", "", "Schedule Appointment")
+            );
+
+            const dateLabel = element(
+                "label",
+                "feedback-label",
+                "Appointment date"
+            );
+
+            const dateInput = element("input", "feedback-input");
+            dateInput.type = "date";
+            dateInput.min = new Date().toLocaleDateString("en-CA");
+            dateInput.required = true;
+
+            dateLabel.htmlFor = `appointment-date-${request.id}`;
+            dateInput.id = dateLabel.htmlFor;
+
+            const timeLabel = element(
+                "label",
+                "feedback-label",
+                "Appointment time"
+            );
+
+            const timeInput = element("input", "feedback-input");
+            timeInput.type = "time";
+            timeInput.required = true;
+
+            timeLabel.htmlFor = `appointment-time-${request.id}`;
+            timeInput.id = timeLabel.htmlFor;
+
+            const scheduleButton = element(
+                "button",
+                "small-button accept",
+                "Schedule Appointment"
+            );
+
+            scheduleButton.type = "button";
+
+            scheduleButton.addEventListener("click", () => {
+                scheduleAppointment(
+                    request,
+                    dateInput,
+                    timeInput,
+                    scheduleButton
+                );
+            });
+
+            scheduleGroup.append(
+                dateLabel,
+                dateInput,
+                timeLabel,
+                timeInput,
+                scheduleButton
+            );
+
+            main.appendChild(scheduleGroup);
+        }
+    }
+
+    // Display previously saved feedback
+    if (request.lawyerFeedback) {
+        const savedFeedback = element("div", "saved-feedback");
+        savedFeedback.appendChild(
+            element("strong", "", "Your feedback")
+        );
+        savedFeedback.appendChild(
+            element("p", "", request.lawyerFeedback)
+        );
+        main.appendChild(savedFeedback);
     }
 
     item.appendChild(main);
@@ -485,39 +630,167 @@ function renderRequests() {
 $("requestSearch")?.addEventListener("input", renderRequests);
 $("requestStatusFilter")?.addEventListener("change", renderRequests);
 
-async function updateRequestStatus(requestId, status, button) {
+
+
+async function updateRequestStatus(
+    requestId,
+    status,
+    button,
+    feedbackText = ""
+) {
     if (!currentUser) return;
 
+    const lawyerFeedback = feedbackText.trim();
+
+    if (lawyerFeedback.length > 1000) {
+        showMessage(
+            "Feedback must be 1,000 characters or fewer.",
+            "error"
+        );
+        return;
+    }
+
     button.disabled = true;
+    const originalText = button.textContent;
+    button.textContent = "Saving...";
 
     try {
         await updateDoc(
             doc(db, "consultationRequests", requestId),
             {
                 status,
+                lawyerFeedback,
                 updatedAt: serverTimestamp()
             }
         );
 
-        const request = requests.find((item) => item.id === requestId);
-        if (request) request.status = status;
+        const request = requests.find(
+            (item) => item.id === requestId
+        );
+
+        if (request) {
+            request.status = status;
+            request.lawyerFeedback = lawyerFeedback;
+        }
 
         renderRequests();
         updateStatistics();
 
-        showMessage(`Request ${status}.`, "success");
+        showMessage(
+            `Request ${status}. Feedback saved successfully.`,
+            "success"
+        );
 
     } catch (error) {
         console.error("Could not update request:", error);
 
         showMessage(
-            "We couldn't update this request. Confirm that you are assigned to it and that Firestore rules allow this action.",
+            "We couldn't update this request. Check your Firestore security rules.",
             "error"
         );
 
         button.disabled = false;
+        button.textContent = originalText;
     }
 }
+
+async function scheduleAppointment(request, dateInput, timeInput, button) {
+    if (!currentUser) return;
+
+    if (normaliseStatus(request.status) !== "accepted") {
+        showMessage(
+            "Only accepted consultation requests can be scheduled.",
+            "error"
+        );
+        return;
+    }
+
+    if (!request.clientId) {
+        showMessage(
+            "This request has no client ID. Please check the request document in Firestore.",
+            "error"
+        );
+        return;
+    }
+
+    const date = dateInput.value;
+    const time = timeInput.value;
+
+    if (!date || !time) {
+        showMessage("Please select an appointment date and time.", "error");
+        return;
+    }
+
+    const dateTime = new Date(`${date}T${time}`);
+
+    if (Number.isNaN(dateTime.getTime()) || dateTime <= new Date()) {
+        showMessage(
+            "Choose a valid appointment date and time in the future.",
+            "error"
+        );
+        return;
+    }
+
+    button.disabled = true;
+    const originalText = button.textContent;
+    button.textContent = "Scheduling...";
+
+    try {
+        // Prevent duplicate appointments for the same request.
+        
+        const existingQuery = query(
+            collection(db, "appointments"),
+            where("lawyerId", "==", currentUser.uid)
+        );
+
+        const existingSnapshot = await getDocs(existingQuery);
+
+        const alreadyScheduled = existingSnapshot.docs.some(
+            (item) => item.data().requestId === request.id
+        );
+
+        if (alreadyScheduled) {
+            showMessage(
+                "An appointment already exists for this request.",
+                "error"
+            );
+            return;
+        }
+
+        await addDoc(collection(db, "appointments"), {
+            requestId: request.id,
+            clientId: request.clientId,
+            lawyerId: currentUser.uid,
+            clientName: request.clientName || "HakiLink Client",
+            title: request.subject || "Client consultation",
+            dateTime: Timestamp.fromDate(dateTime),
+            status: "scheduled",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+
+        await loadAppointments();
+
+        showMessage(
+            "Appointment scheduled successfully!",
+            "success"
+        );
+
+    } catch (error) {
+    console.error("Appointment scheduling failed:", error);
+    console.error("Firebase error code:", error.code);
+    console.error("Firebase error message:", error.message);
+
+    showMessage(
+        `Scheduling failed: ${error.code || "unknown-error"} — ${error.message || "Unknown error"}`,
+        "error"
+    );
+} finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
 
 
 // ============================================
@@ -553,6 +826,7 @@ async function loadAppointments() {
         });
 
         renderAppointments();
+        renderRequests();
         updateStatistics();
 
     } catch (error) {
@@ -955,7 +1229,7 @@ logoutButton?.addEventListener("click", async () => {
 
     try {
         await signOut(auth);
-        window.location.replace("../auth/login.html");
+        window.location.replace("../pages/login.html");
     } catch (error) {
         console.error("Logout failed:", error);
         showMessage("Unable to sign out. Please try again.", "error");
@@ -970,7 +1244,7 @@ logoutButton?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        window.location.replace("../auth/login.html");
+        window.location.replace("../pages/login.html");
         return;
     }
 

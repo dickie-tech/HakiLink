@@ -11,9 +11,7 @@
     <link rel="icon" type="image/png" href="../assets/hakilink-logo.jpg">
     <title>Client Dashboard | HakiLink</title>
 
-    <link
-      rel="stylesheet"
-      href="../styles/client-dashboard.css">
+    <link rel="stylesheet" href="../styles/clients-dashboard.css">
 
   </head>
 
@@ -98,7 +96,15 @@
             </span>
 
           </a>
+          <a href="#appointments" class="nav-item">
+            <span class="nav-icon">
+              <img src="../assets/consultations.png" alt="Appointments">
+            </span>
 
+            <span>Appointments</span>
+
+            <span class="nav-badge" id="appointmentNavCount">0</span>
+          </a>
           <a
             href="#messages"
             class="nav-item">
@@ -539,7 +545,23 @@
             </div>
 
           </section>
+          <section class="dashboard-section" id="appointments">
+            <div class="section-header">
+              <div>
+                <span class="eyebrow">YOUR CONSULTATIONS</span>
+                <h2>My Appointments</h2>
+                <p>View consultations scheduled by your lawyers.</p>
+              </div>
+            </div>
 
+            <div class="requests-card">
+              <div id="clientAppointmentsList" class="appointments-list">
+                <div class="empty-state">
+                  <h3>Loading appointments...</h3>
+                </div>
+              </div>
+            </div>
+          </section>
           <!-- ========================================= -->
           <!-- AI ASSISTANT -->
           <!-- ========================================= -->
@@ -731,6 +753,48 @@
     <!-- ========================================= -->
     <!-- JAVASCRIPT -->
     <!-- ========================================= -->
+
+    <!-- Consultation Request Modal -->
+    <div class="modal-overlay" id="consultationModal" hidden>
+      <div class="consultation-modal" role="dialog"
+        aria-modal="true" aria-labelledby="consultationModalTitle">
+
+        <button type="button" class="modal-close"
+          id="closeConsultationModal" aria-label="Close">
+          &times;
+        </button>
+
+        <p class="eyebrow">GET LEGAL ASSISTANCE</p>
+        <h2 id="consultationModalTitle">Request a Consultation</h2>
+
+        <p>Lawyer: <strong id="selectedLawyerName"></strong></p>
+
+        <form id="consultationForm">
+          <label for="consultationSubject">Subject</label>
+          <input
+            type="text"
+            id="consultationSubject"
+            maxlength="120"
+            placeholder="e.g. Property ownership dispute"
+            required>
+
+          <label for="consultationDescription">Describe your legal issue</label>
+          <textarea
+            id="consultationDescription"
+            rows="5"
+            maxlength="3000"
+            placeholder="Briefly explain the assistance you need..."
+            required></textarea>
+
+          <p id="consultationFormMessage" role="status"></p>
+
+          <button type="submit" id="submitConsultationRequest"
+            class="primary-button">
+            Submit Request →
+          </button>
+        </form>
+      </div>
+    </div>
 
     <script
       type="module"
