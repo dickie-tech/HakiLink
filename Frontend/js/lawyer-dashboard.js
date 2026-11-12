@@ -22,7 +22,8 @@ import {
     orderBy,
     addDoc,
     serverTimestamp,
-    Timestamp
+    Timestamp,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -52,6 +53,21 @@ const sidebar = $("sidebar");
 
 const profileForm = $("profileForm");
 const messageForm = $("messageForm");
+
+
+// ============================================
+// LAWYER NOTIFICATIONS
+// ============================================
+
+let unsubscribeNotifications = null;
+let lawyerNotifications = [];
+
+const notificationButton = $("notificationButton");
+const notificationDropdown = $("notificationDropdown");
+const notificationCount = $("notificationCount");
+const notificationList = $("notificationList");
+const notificationSubtitle = $("notificationSubtitle");
+const markAllReadButton = $("markAllReadButton");
 
 
 // ============================================
@@ -157,6 +173,254 @@ function showEmpty(container, message) {
         element("p", "empty-state", message)
     );
 }
+
+
+
+// ============================================
+// LAWYER NOTIFICATION FUNCTIONS
+// ============================================
+
+function escapeNotificationText(value = "") {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[character]);
+}
+
+
+// Format notification timestamp
+function formatNotificationDate(timestamp) {
+    if (!timestamp) return "Just now";
+
+    const date = timestamp.toDate
+        ? timestamp.toDate()
+        : new Date(timestamp);
+
+    if (Number.isNaN(date.getTime())) return "Just now";
+
+    return date.toLocaleString("en-KE", {
+        dateStyle: "medium",
+        timeStyle: "short"
+    });
+}
+
+
+// Listen for notifications belonging to the logged-in lawyer
+function listenForLawyerNotifications(user) {
+
+    if (unsubscribeNotifications) {
+        unsubscribeNotifications();
+    }
+
+    const notificationsQuery = query(
+        collection(db, "notifications"),
+        where("recipientId", "==", user.uid)
+    );
+
+    unsubscribeNotifications = onSnapshot(
+        notificationsQuery,
+
+        snapshot => {
+            lawyerNotifications = snapshot.docs.map(item => ({
+                id: item.id,
+                ...item.data()
+            }));
+
+            lawyerNotifications.sort((a, b) => {
+                return toMillis(b.createdAt) - toMillis(a.createdAt);
+            });
+
+            renderLawyerNotifications();
+        },
+
+        error => {
+            console.error(
+                "Lawyer notification listener failed:",
+                error
+            );
+        }
+    );
+}
+
+
+// Display notifications and unread count
+function renderLawyerNotifications() {
+
+    if (!notificationList || !notificationCount) return;
+
+    const unreadCount = lawyerNotifications.filter(
+        item => item.isRead === false
+    ).length;
+
+    notificationCount.textContent =
+        unreadCount > 99 ? "99+" : unreadCount;
+
+    notificationCount.hidden = unreadCount === 0;
+
+    if (notificationSubtitle) {
+        notificationSubtitle.textContent =
+            unreadCount === 0
+                ? "You're all caught up."
+                : `You have ${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}.`;
+    }
+
+    if (lawyerNotifications.length === 0) {
+        notificationList.innerHTML = `
+            <div class="notification-empty">
+                <p>No notifications yet.</p>
+            </div>
+        `;
+        return;
+    }
+
+    notificationList.innerHTML = lawyerNotifications.map(item => `
+        <div
+            class="notification-item ${item.isRead ? "" : "unread"}"
+            data-notification-id="${escapeNotificationText(item.id)}"
+            role="button"
+            tabindex="0"
+        >
+            <div class="notification-item-content">
+                <h4>${escapeNotificationText(item.title || "Notification")}</h4>
+
+                <p>${escapeNotificationText(item.message || "")}</p>
+
+                <small>
+                    ${escapeNotificationText(formatNotificationDate(item.createdAt))}
+                </small>
+            </div>
+        </div>
+    `).join("");
+}
+
+
+// Mark an individual notification as read
+async function markLawyerNotificationAsRead(notificationId) {
+
+    const notification = lawyerNotifications.find(
+        item => item.id === notificationId
+    );
+
+    if (!notification || notification.isRead) return;
+
+    try {
+        await updateDoc(
+            doc(db, "notifications", notificationId),
+            { isRead: true }
+        );
+
+    } catch (error) {
+        console.error("Could not mark notification as read:", error);
+    }
+}
+
+
+// Mark all notifications as read
+async function markAllLawyerNotificationsAsRead() {
+
+    const unread = lawyerNotifications.filter(
+        item => item.isRead === false
+    );
+
+    if (!unread.length) return;
+
+    if (markAllReadButton) {
+        markAllReadButton.disabled = true;
+    }
+
+    try {
+        await Promise.all(
+            unread.map(item =>
+                updateDoc(
+                    doc(db, "notifications", item.id),
+                    { isRead: true }
+                )
+            )
+        );
+
+    } catch (error) {
+        console.error("Could not mark all notifications as read:", error);
+
+    } finally {
+        if (markAllReadButton) {
+            markAllReadButton.disabled = false;
+        }
+    }
+}
+
+
+// Toggle notification dropdown
+notificationButton?.addEventListener("click", () => {
+
+    if (!notificationDropdown) return;
+
+    const isOpening = notificationDropdown.hidden;
+
+    notificationDropdown.hidden = !isOpening;
+
+    notificationButton.setAttribute(
+        "aria-expanded",
+        String(isOpening)
+    );
+});
+
+
+// Handle individual notification clicks
+notificationList?.addEventListener("click", event => {
+
+    const item = event.target.closest("[data-notification-id]");
+
+    if (!item) return;
+
+    markLawyerNotificationAsRead(
+        item.dataset.notificationId
+    );
+});
+
+
+// Keyboard support
+notificationList?.addEventListener("keydown", event => {
+
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    const item = event.target.closest("[data-notification-id]");
+
+    if (!item) return;
+
+    event.preventDefault();
+
+    markLawyerNotificationAsRead(
+        item.dataset.notificationId
+    );
+});
+
+
+// Mark all as read
+markAllReadButton?.addEventListener(
+    "click",
+    markAllLawyerNotificationsAsRead
+);
+
+
+// Close dropdown when clicking outside
+document.addEventListener("click", event => {
+
+    if (
+        notificationDropdown &&
+        notificationButton &&
+        !event.target.closest(".notification-wrapper")
+    ) {
+        notificationDropdown.hidden = true;
+
+        notificationButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+    }
+});
 
 
 // ============================================
@@ -632,6 +896,7 @@ $("requestStatusFilter")?.addEventListener("change", renderRequests);
 
 
 
+
 async function updateRequestStatus(
     requestId,
     status,
@@ -650,11 +915,27 @@ async function updateRequestStatus(
         return;
     }
 
+    // Find the consultation request.
+    const request = requests.find(
+        (item) => item.id === requestId
+    );
+
+    if (!request || !request.clientId) {
+        showMessage(
+            "Could not find the client's account information.",
+            "error"
+        );
+        return;
+    }
+
     button.disabled = true;
+
     const originalText = button.textContent;
     button.textContent = "Saving...";
 
     try {
+
+        // 1. Update consultation request status.
         await updateDoc(
             doc(db, "consultationRequests", requestId),
             {
@@ -664,35 +945,99 @@ async function updateRequestStatus(
             }
         );
 
-        const request = requests.find(
-            (item) => item.id === requestId
-        );
+        // 2. Update local request data.
+        request.status = status;
+        request.lawyerFeedback = lawyerFeedback;
 
-        if (request) {
-            request.status = status;
-            request.lawyerFeedback = lawyerFeedback;
+        // 3. Create a notification for the client.
+        const notificationType =
+            status === "accepted"
+                ? "consultation_accepted"
+                : "consultation_declined";
+
+        const notificationTitle =
+            status === "accepted"
+                ? "Consultation Request Accepted"
+                : "Consultation Request Declined";
+
+        const notificationMessage =
+            status === "accepted"
+                ? `${currentProfile.fullName || "Your lawyer"} has accepted your consultation request.`
+                : `${currentProfile.fullName || "Your lawyer"} has declined your consultation request.`;
+
+        console.log("Notification data:", {
+                recipientId: request.clientId,
+                senderId: currentUser.uid,
+                type: notificationType,
+                relatedId: requestId,
+                status: request.status
+            });
+
+        try {
+
+            await setDoc(
+                doc(
+                    db,
+                    "notifications",
+                    `${requestId}_${notificationType}`
+                ),
+                {
+                    recipientId: request.clientId,
+                    senderId: currentUser.uid,
+                    title: notificationTitle,
+                    message: notificationMessage,
+                    type: notificationType,
+                    relatedId: requestId,
+                    isRead: false,
+                    createdAt: serverTimestamp()
+                }
+            );
+
+            console.log(
+                "Client notification created successfully."
+            );
+
+        } catch (notificationError) {
+
+            console.error(
+                "Consultation updated, but notification creation failed:",
+                notificationError
+            );
+
+            showMessage(
+                `Request updated, but notification failed: ${notificationError.code || notificationError.message}`,
+                "error"
+            );
+
         }
 
+        // 4. Refresh dashboard.
         renderRequests();
         updateStatistics();
 
         showMessage(
-            `Request ${status}. Feedback saved successfully.`,
+            `Request ${status} successfully.`,
             "success"
         );
 
     } catch (error) {
+
         console.error("Could not update request:", error);
+        console.error("Firebase error code:", error.code);
 
         showMessage(
-            "We couldn't update this request. Check your Firestore security rules.",
+            `Could not update request: ${error.message}`,
             "error"
         );
 
+    } finally {
+
         button.disabled = false;
         button.textContent = originalText;
+
     }
 }
+
 
 async function scheduleAppointment(request, dateInput, timeInput, button) {
     if (!currentUser) return;
@@ -1242,8 +1587,24 @@ logoutButton?.addEventListener("click", async () => {
 // AUTHENTICATION AND INITIALISATION
 // ============================================
 
+
+// ============================================
+// AUTHENTICATION AND INITIALISATION
+// ============================================
+
 onAuthStateChanged(auth, async (user) => {
+
     if (!user) {
+
+        // Stop notification listener when logged out.
+        if (unsubscribeNotifications) {
+            unsubscribeNotifications();
+            unsubscribeNotifications = null;
+        }
+
+        lawyerNotifications = [];
+        currentUser = null;
+
         window.location.replace("../pages/login.html");
         return;
     }
@@ -1251,10 +1612,13 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
 
     try {
+
         await loadProfile(user);
 
-        // Load each section independently so one missing collection
-        // doesn't prevent the other dashboard sections from working.
+        // Start real-time lawyer notifications.
+        listenForLawyerNotifications(user);
+
+        // Load dashboard sections independently.
         await Promise.allSettled([
             loadRequests(),
             loadAppointments(),
@@ -1262,6 +1626,7 @@ onAuthStateChanged(auth, async (user) => {
         ]);
 
     } catch (error) {
+
         console.error("Dashboard initialisation failed:", error);
 
         showMessage(
@@ -1270,3 +1635,4 @@ onAuthStateChanged(auth, async (user) => {
         );
     }
 });
+
