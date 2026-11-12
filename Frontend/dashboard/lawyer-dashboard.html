@@ -67,21 +67,72 @@
       </aside>
 
       <main class="main-area">
+
         <header class="topbar">
           <button id="menuButton" class="menu-button"
             aria-label="Toggle navigation">☰</button>
 
-          <div>
+          <div class="topbar-heading">
             <p class="topbar-eyebrow">LAWYER WORKSPACE</p>
             <h2 id="pageTitle">Overview</h2>
           </div>
 
-          <div class="topbar-user">
-            <div class="avatar" id="userAvatar">HL</div>
-            <div class="topbar-user-info">
-              <strong id="topbarUserName">Loading...</strong>
-              <span>Lawyer account</span>
+          <div class="topbar-actions">
+
+            <!-- NOTIFICATIONS -->
+            <div class="notification-wrapper">
+
+              <button type="button"
+                class="notification-button"
+                id="notificationButton"
+                aria-label="Open notifications"
+                aria-expanded="false"
+                aria-controls="notificationDropdown">
+
+                <span class="notification-bell" aria-hidden="true">♧</span>
+
+                <span class="notification-count"
+                  id="notificationCount" hidden>0</span>
+              </button>
+
+              <div class="notification-dropdown"
+                id="notificationDropdown" hidden>
+
+                <div class="notification-header">
+                  <div>
+                    <h3>Notifications</h3>
+                    <p id="notificationSubtitle">
+                      You're all caught up.
+                    </p>
+                  </div>
+
+                  <button type="button"
+                    id="markAllReadButton">
+                    Mark all read
+                  </button>
+                </div>
+
+                <div class="notification-list"
+                  id="notificationList">
+
+                  <div class="notification-empty">
+                    <p>No notifications yet.</p>
+                  </div>
+
+                </div>
+              </div>
             </div>
+
+            <!-- LAWYER PROFILE -->
+            <div class="topbar-user">
+              <div class="avatar" id="userAvatar">HL</div>
+
+              <div class="topbar-user-info">
+                <strong id="topbarUserName">Loading...</strong>
+                <span>Lawyer account</span>
+              </div>
+            </div>
+
           </div>
         </header>
 

@@ -17,10 +17,13 @@ import {
     getDoc,
     collection,
     addDoc,
+    setDoc,
     serverTimestamp,
     getDocs,
     query,
-    where
+    where,
+    onSnapshot,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -66,6 +69,30 @@ let currentClientName = "";
 let selectedLawyer = null;
 let lawyers = [];
 let clientRequests = [];
+
+// =====================================
+// NOTIFICATION STATE
+// =====================================
+
+let unsubscribeNotifications = null;
+
+const notificationButton =
+    document.getElementById("notificationButton");
+
+const notificationDropdown =
+    document.getElementById("notificationDropdown");
+
+const notificationCount =
+    document.getElementById("notificationCount");
+
+const notificationList =
+    document.getElementById("notificationList");
+
+const notificationSubtitle =
+    document.getElementById("notificationSubtitle");
+
+const markAllReadButton =
+    document.getElementById("markAllReadButton");
 
 
 // ============================================
@@ -144,6 +171,266 @@ function createElement(tag, className, text) {
 
     return element;
 }
+
+
+// =====================================
+// CLIENT NOTIFICATION SYSTEM
+// =====================================
+
+// Escape text before inserting notification content into HTML.
+function escapeNotificationText(value = "") {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+
+// Format Firestore timestamps.
+function formatNotificationDate(timestamp) {
+    if (!timestamp || typeof timestamp.toDate !== "function") {
+        return "Just now";
+    }
+
+    return timestamp.toDate().toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short"
+    });
+}
+
+
+// Listen for notifications belonging to the logged-in client.
+function listenForClientNotifications(user) {
+
+    // Stop any previous listener.
+    if (unsubscribeNotifications) {
+        unsubscribeNotifications();
+    }
+
+    const notificationsQuery = query(
+        collection(db, "notifications"),
+        where("recipientId", "==", user.uid)
+    );
+
+    unsubscribeNotifications = onSnapshot(
+        notificationsQuery,
+
+        snapshot => {
+            const notifications = snapshot.docs.map(document => ({
+                id: document.id,
+                ...document.data()
+            }));
+
+            // Newest notifications first.
+            notifications.sort((a, b) => {
+                const dateA = a.createdAt?.toMillis?.() || 0;
+                const dateB = b.createdAt?.toMillis?.() || 0;
+
+                return dateB - dateA;
+            });
+
+            renderClientNotifications(notifications);
+        },
+
+        error => {
+            console.error(
+                "Error listening for client notifications:",
+                error
+            );
+
+            if (notificationList) {
+                notificationList.innerHTML = `
+                    <div class="notification-empty">
+                        <p>Unable to load notifications.</p>
+                    </div>
+                `;
+            }
+        }
+    );
+}
+
+
+// Display notifications and update the unread badge.
+function renderClientNotifications(notifications) {
+
+    if (!notificationList) return;
+
+    const unreadNotifications = notifications.filter(
+        notification => notification.isRead === false
+    );
+
+    // Update notification count.
+    if (notificationCount) {
+        const unreadCount = unreadNotifications.length;
+
+        notificationCount.textContent =
+            unreadCount > 99 ? "99+" : unreadCount;
+
+        notificationCount.hidden = unreadCount === 0;
+    }
+
+    // Update subtitle.
+    if (notificationSubtitle) {
+        notificationSubtitle.textContent =
+            unreadNotifications.length > 0
+                ? `${unreadNotifications.length} unread notification(s)`
+                : "You're all caught up.";
+    }
+
+    // Empty state.
+    if (notifications.length === 0) {
+        notificationList.innerHTML = `
+            <div class="notification-empty">
+                <p>No notifications yet.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Render notification items.
+    notificationList.innerHTML = notifications.map(notification => {
+
+        const title = escapeNotificationText(notification.title);
+        const message = escapeNotificationText(notification.message);
+        const date = formatNotificationDate(notification.createdAt);
+
+        const unreadClass = notification.isRead
+            ? ""
+            : "unread";
+
+        return `
+            <div
+                class="notification-item ${unreadClass}"
+                data-notification-id="${escapeNotificationText(notification.id)}"
+            >
+                <div class="notification-icon">⚖</div>
+
+                <div>
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                    <small>${escapeNotificationText(date)}</small>
+                </div>
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+// Mark one notification as read.
+async function markNotificationAsRead(notificationId) {
+
+    try {
+        await updateDoc(
+            doc(db, "notifications", notificationId),
+            {
+                isRead: true
+            }
+        );
+
+    } catch (error) {
+        console.error("Could not mark notification as read:", error);
+    }
+}
+
+
+// Mark all client notifications as read.
+async function markAllClientNotificationsAsRead() {
+
+    if (!currentClient) return;
+
+    try {
+        const notificationsQuery = query(
+            collection(db, "notifications"),
+            where("recipientId", "==", currentClient.uid)
+        );
+
+        const snapshot = await getDocs(notificationsQuery);
+
+        const unreadNotifications = snapshot.docs.filter(
+            notification => notification.data().isRead === false
+        );
+
+        await Promise.all(
+            unreadNotifications.map(notification =>
+                updateDoc(notification.ref, {
+                    isRead: true
+                })
+            )
+        );
+
+    } catch (error) {
+        console.error("Could not mark all notifications as read:", error);
+    }
+}
+
+
+// Toggle notification dropdown.
+if (notificationButton && notificationDropdown) {
+
+    notificationButton.addEventListener("click", () => {
+
+        const isOpening = notificationDropdown.hidden;
+
+        notificationDropdown.hidden = !isOpening;
+
+        notificationButton.setAttribute(
+            "aria-expanded",
+            String(isOpening)
+        );
+    });
+}
+
+
+// Mark a notification as read when clicked.
+if (notificationList) {
+
+    notificationList.addEventListener("click", event => {
+
+        const notificationItem = event.target.closest(
+            ".notification-item"
+        );
+
+        if (!notificationItem) return;
+
+        const notificationId =
+            notificationItem.dataset.notificationId;
+
+        if (notificationId) {
+            markNotificationAsRead(notificationId);
+        }
+    });
+}
+
+
+// Mark all notifications as read.
+if (markAllReadButton) {
+    markAllReadButton.addEventListener(
+        "click",
+        markAllClientNotificationsAsRead
+    );
+}
+
+
+// Close dropdown when clicking outside.
+document.addEventListener("click", event => {
+
+    if (
+        notificationDropdown &&
+        notificationButton &&
+        !event.target.closest(".notification-wrapper")
+    ) {
+        notificationDropdown.hidden = true;
+
+        notificationButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+    }
+});
 
 
 // ============================================
@@ -502,18 +789,48 @@ if (consultationForm) {
                     );
                 }
 
-                await addDoc(
-                    collection(db, "consultationRequests"),
-                    {
-                        lawyerId,
-                        clientId: currentClient.uid,
-                        clientName: currentClientName,
-                        subject,
-                        description,
-                        status: "pending",
-                        requestedAt: serverTimestamp()
+                const requestRef = await addDoc(
+                        collection(db, "consultationRequests"),
+                        {
+                            lawyerId: selectedLawyer.uid,
+                            clientId: currentClient.uid,
+                            clientName: currentClientName,
+                            subject: subject,
+                            description: description,
+                            status: "pending",
+                            requestedAt: serverTimestamp()
+                        }
+                    );
+
+                    // Notify the assigned lawyer.
+                    try {
+
+                        await setDoc(
+                            doc(
+                                db,
+                                "notifications",
+                                `${requestRef.id}_consultation_request`
+                            ),
+                            {
+                                recipientId: selectedLawyer.uid,
+                                senderId: currentClient.uid,
+                                title: "New consultation request",
+                                message: `${currentClientName} has sent you a consultation request.`,
+                                type: "consultation_request",
+                                relatedId: requestRef.id,
+                                isRead: false,
+                                createdAt: serverTimestamp()
+                            }
+                        );
+
+                    } catch (notificationError) {
+
+                        console.error(
+                            "Consultation was submitted, but notification failed:",
+                            notificationError
+                        );
+
                     }
-                );
 
                 consultationFormMessage.textContent =
                     "Request submitted successfully!";
@@ -882,6 +1199,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     await loadClientProfile(user);
+    listenForClientNotifications(user);
 
     if (!currentClient) {
         return;
@@ -916,11 +1234,63 @@ if (logoutButton) {
 // MOBILE HAMBURGER MENU
 // ============================================
 
+
+// ============================================
+// MOBILE HAMBURGER MENU
+// ============================================
+
 const menuButton = document.getElementById("menuButton");
 const sidebar = document.getElementById("sidebar");
 
+function closeSidebar() {
+    if (!sidebar || !menuButton) return;
+
+    sidebar.classList.remove("open");
+    menuButton.setAttribute("aria-expanded", "false");
+}
+
+function toggleSidebar() {
+    if (!sidebar || !menuButton) return;
+
+    const isOpen = sidebar.classList.toggle("open");
+
+    menuButton.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+    );
+}
+
 if (menuButton && sidebar) {
-    menuButton.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
+
+    // Open and close using the hamburger button
+    menuButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggleSidebar();
     });
+
+    // Close when clicking outside the sidebar
+    document.addEventListener("click", (event) => {
+        if (
+            sidebar.classList.contains("open") &&
+            !sidebar.contains(event.target) &&
+            !menuButton.contains(event.target)
+        ) {
+            closeSidebar();
+        }
+    });
+
+    // Close when a navigation link is selected
+    sidebar.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+            closeSidebar();
+        });
+    });
+
+    // Close when Escape is pressed
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeSidebar();
+        }
+    });
+
 }
