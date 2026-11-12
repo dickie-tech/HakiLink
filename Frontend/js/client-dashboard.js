@@ -23,7 +23,9 @@ import {
     query,
     where,
     onSnapshot,
-    updateDoc
+    updateDoc,
+     orderBy,
+    increment
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -69,6 +71,13 @@ let currentClientName = "";
 let selectedLawyer = null;
 let lawyers = [];
 let clientRequests = [];
+
+let conversations = [];
+let selectedConversationId = null;
+
+let unsubscribeConversations = null;
+let unsubscribeMessages = null;
+
 
 // =====================================
 // NOTIFICATION STATE
@@ -625,6 +634,7 @@ function renderLawyers() {
             "Legal professional listed on HakiLink."
         );
 
+                
         const requestButton = createElement(
             "button",
             "request-consultation-button",
@@ -637,12 +647,32 @@ function renderLawyers() {
             openConsultationModal(lawyer);
         });
 
+        const messageButton = createElement(
+            "button",
+            "message-lawyer-btn",
+            "Message Lawyer"
+        );
+
+        messageButton.type = "button";
+
+        messageButton.addEventListener("click", () => {
+            startConversationWithLawyer(lawyer);
+        });
+
+
+        requestButton.type = "button";
+
+        requestButton.addEventListener("click", () => {
+            openConsultationModal(lawyer);
+        });
+
         card.append(
             avatar,
             name,
             specialty,
             description,
-            requestButton
+            requestButton,
+            messageButton
         );
 
         lawyersGrid.appendChild(card);
@@ -1187,6 +1217,479 @@ async function loadClientAppointments(user) {
         `;
     }
 }
+
+/* ============================================
+   CLIENT MESSAGING SYSTEM
+============================================ */
+
+// Prevent HTML from being interpreted as markup
+function escapeMessageHTML(value = "") {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[char]);
+}
+
+
+// Format message/conversation time
+function formatMessageTime(timestamp) {
+    if (!timestamp || !timestamp.toDate) return "";
+
+    return timestamp.toDate().toLocaleString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "numeric",
+        month: "short"
+    });
+}
+
+
+// Listen for conversations belonging to the logged-in client
+function listenForClientConversations() {
+    if (!currentClient) return;
+
+    if (unsubscribeConversations) {
+        unsubscribeConversations();
+    }
+
+    const conversationsQuery = query(
+        collection(db, "conversations"),
+        where("clientId", "==", currentClient.uid)
+    );
+
+    unsubscribeConversations = onSnapshot(
+        conversationsQuery,
+        snapshot => {
+            conversations = snapshot.docs.map(document => ({
+                id: document.id,
+                ...document.data()
+            }));
+
+            conversations.sort((a, b) => {
+                const timeA = a.updatedAt?.toMillis?.() || 0;
+                const timeB = b.updatedAt?.toMillis?.() || 0;
+
+                return timeB - timeA;
+            });
+
+            function getClientUnreadCount() {
+                return conversations.reduce((total, conversation) => {
+                    return total + (Number(conversation.clientUnreadCount) || 0);
+                }, 0);
+            }
+            renderClientConversations();
+
+            const count = document.getElementById("messagesCount");
+            const navCount = document.getElementById("messagesNavCount");
+            const conversationCount = document.getElementById("conversationCount");
+
+           if (count) {
+                count.textContent = conversations.length;
+            }
+
+            // Show unread messages, not total conversations.
+            if (navCount) {
+                navCount.textContent = getClientUnreadCount();
+            }
+
+            if (conversationCount) {
+                conversationCount.textContent = conversations.length;
+            }
+
+            // Refresh the selected conversation header when its details change
+            if (selectedConversationId) {
+                const selected = conversations.find(
+                    conversation => conversation.id === selectedConversationId
+                );
+
+                if (selected) {
+                    updateClientChatHeader(selected);
+                }
+            }
+        },
+        error => {
+            console.error("Error loading conversations:", error);
+        }
+    );
+}
+
+
+// Display conversations in the sidebar
+function renderClientConversations() {
+    const list = document.getElementById("conversationsList");
+
+    if (!list) return;
+
+    const searchInput = document.getElementById("conversationSearch");
+    const searchTerm = searchInput?.value.toLowerCase().trim() || "";
+
+    const filtered = conversations.filter(conversation =>
+        (conversation.lawyerName || "Lawyer")
+            .toLowerCase()
+            .includes(searchTerm)
+    );
+
+    if (filtered.length === 0) {
+        list.innerHTML = `
+            <div class="messages-empty">
+                <span>💬</span>
+                <h4>No conversations found</h4>
+                <p>Your conversations with lawyers will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = filtered.map(conversation => {
+        const lawyerName = escapeMessageHTML(
+            conversation.lawyerName || "Lawyer"
+        );
+
+        const lastMessage = escapeMessageHTML(
+            conversation.lastMessage || "Start a conversation"
+        );
+
+        const active = conversation.id === selectedConversationId
+            ? "active"
+            : "";
+            const unread = Number(conversation.clientUnreadCount) || 0;
+
+            const unreadBadge = unread > 0
+                ? `<span class="conversation-unread-count">
+                    ${unread > 99 ? "99+" : unread}
+                </span>`
+                : "";
+
+            const unreadClass = unread > 0 ? "has-unread" : "";
+
+        return `
+            <div class="conversation-item ${active} ${unreadClass}"
+                 data-conversation-id="${escapeMessageHTML(conversation.id)}">
+
+                <div class="conversation-avatar">
+                    ${lawyerName.charAt(0).toUpperCase()}
+                </div>
+
+                <div class="conversation-details">
+                    <h4>${lawyerName}</h4>
+                    <p>${lastMessage}</p>
+                </div>
+                ${unreadBadge}
+            </div>
+        `;
+    }).join("");
+}
+
+
+// Update the chat header
+function updateClientChatHeader(conversation) {
+    const header = document.getElementById("chatHeader");
+
+    if (!header) return;
+
+    const lawyerName = escapeMessageHTML(
+        conversation.lawyerName || "Lawyer"
+    );
+
+    header.innerHTML = `
+        <div class="chat-placeholder">
+            <span>⚖️</span>
+            <div>
+                <h3>${lawyerName}</h3>
+                <p>Secure conversation with your legal professional</p>
+            </div>
+        </div>
+    `;
+}
+
+
+// Open a selected conversation
+async function selectClientConversation(conversation) {
+    selectedConversationId = conversation.id;
+
+    // Reset the client's unread message count.
+    conversation.clientUnreadCount = 0;
+
+    renderClientConversations();
+
+    try {
+        await updateDoc(
+            doc(db, "conversations", conversation.id),
+            {
+                clientUnreadCount: 0
+            }
+        );
+    } catch (error) {
+        console.error(
+            "Could not reset client unread count:",
+            error
+        );
+    }
+
+    renderClientConversations();
+    updateClientChatHeader(conversation);
+
+    const input = document.getElementById("messageInput");
+    const button = document.getElementById("sendMessageButton");
+
+    if (input) {
+        input.disabled = false;
+        input.placeholder = "Type your message...";
+    }
+
+    if (button) button.disabled = false;
+
+    // Stop listening to the previously selected conversation
+    if (unsubscribeMessages) {
+        unsubscribeMessages();
+    }
+
+    const messagesQuery = query(
+        collection(db, "conversations", conversation.id, "messages"),
+        orderBy("createdAt", "asc")
+    );
+
+    unsubscribeMessages = onSnapshot(
+        messagesQuery,
+        snapshot => {
+            renderClientMessages(snapshot.docs);
+        },
+        error => {
+            console.error("Error loading messages:", error);
+        }
+    );
+}
+
+
+// Display messages
+function renderClientMessages(messageDocs) {
+    const messagesList = document.getElementById("messagesList");
+
+    if (!messagesList) return;
+
+    if (messageDocs.length === 0) {
+        messagesList.innerHTML = `
+            <div class="messages-empty">
+                <span>✉️</span>
+                <h4>No messages yet</h4>
+                <p>Send a message to start the conversation.</p>
+            </div>
+        `;
+        return;
+    }
+
+    messagesList.innerHTML = messageDocs.map(document => {
+        const message = document.data();
+
+        const mine = message.senderId === currentClient.uid;
+        const messageClass = mine ? "mine" : "";
+
+        return `
+            <div class="message-bubble ${messageClass}">
+                <p>${escapeMessageHTML(message.text || "")}</p>
+                <small>${formatMessageTime(message.createdAt)}</small>
+            </div>
+        `;
+    }).join("");
+
+    messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+
+// Start a conversation with a lawyer
+async function startConversationWithLawyer(lawyer) {
+    if (!currentClient || !lawyer) return;
+
+    const lawyerId = lawyer.uid || lawyer.id;
+
+    if (!lawyerId) {
+        alert("Unable to identify this lawyer's account.");
+        return;
+    }
+
+    try {
+        let conversation = conversations.find(item =>
+            item.lawyerId === lawyerId
+        );
+
+        // Check Firestore as well in case the list has not loaded yet
+        if (!conversation) {
+            const existingQuery = query(
+                collection(db, "conversations"),
+                where("clientId", "==", currentClient.uid),
+                where("lawyerId", "==", lawyerId)
+            );
+
+            const existingSnapshot = await getDocs(existingQuery);
+
+            if (!existingSnapshot.empty) {
+                const existingDoc = existingSnapshot.docs[0];
+
+                conversation = {
+                    id: existingDoc.id,
+                    ...existingDoc.data()
+                };
+            }
+        }
+
+        // Create a conversation if one does not already exist
+        if (!conversation) {
+            const lawyerName =
+                lawyer.fullName ||
+                lawyer.name ||
+                lawyer.firmName ||
+                lawyer.lawFirmName ||
+                "Lawyer";
+
+            const conversationRef = await addDoc(
+                collection(db, "conversations"),
+                {
+                    lawyerId: lawyerId,
+                    clientId: currentClient.uid,
+                    clientName: currentClientName || "Client",
+                    lawyerName: lawyerName,
+                    lastMessage: "",
+                    updatedAt: serverTimestamp()
+                }
+            );
+
+            conversation = {
+                id: conversationRef.id,
+                lawyerId: lawyerId,
+                clientId: currentClient.uid,
+                clientName: currentClientName || "Client",
+                lawyerName: lawyerName
+            };
+        }
+
+        // Open the Messages section
+        const messagesSection = document.getElementById("messages");
+
+        if (messagesSection) {
+            messagesSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+        selectClientConversation(conversation);
+
+    } catch (error) {
+        console.error("Error starting conversation:", error);
+        alert("Unable to start conversation. Please try again.");
+    }
+}
+
+
+// Send a message
+async function sendClientMessage(event) {
+    event.preventDefault();
+
+    if (!currentClient || !selectedConversationId) return;
+
+    const input = document.getElementById("messageInput");
+    const button = document.getElementById("sendMessageButton");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    button.disabled = true;
+
+    try {
+        const conversationRef = doc(
+            db,
+            "conversations",
+            selectedConversationId
+        );
+
+        // Save the message in the conversation's messages subcollection
+        await addDoc(
+            collection(
+                db,
+                "conversations",
+                selectedConversationId,
+                "messages"
+            ),
+            {
+                senderId: currentClient.uid,
+                text: text,
+                createdAt: serverTimestamp()
+            }
+        );
+
+        // Update the conversation preview and activity time
+        await updateDoc(conversationRef, {
+            lastMessage: text,
+            updatedAt: serverTimestamp(),
+            lawyerUnreadCount: increment(1)
+        });
+
+        input.value = "";
+
+    } catch (error) {
+        console.error("Error sending message:", error);
+        alert("Message could not be sent. Please try again.");
+    } finally {
+        button.disabled = false;
+        input.focus();
+    }
+}
+
+
+// Connect messaging interface events
+
+function initializeClientMessaging() {
+    const conversationsList =
+        document.getElementById("conversationsList");
+
+    const messageForm =
+        document.getElementById("messageForm");
+
+    const conversationSearch =
+        document.getElementById("conversationSearch");
+
+    // Handle conversation selection
+    conversationsList?.addEventListener("click", event => {
+
+        const clickedElement = event.target.closest(
+            ".conversation-item"
+        );
+
+        if (!clickedElement) return;
+
+        const conversationId =
+            clickedElement.dataset.conversationId;
+
+        const selectedConversation = conversations.find(
+            conversation => conversation.id === conversationId
+        );
+
+        if (selectedConversation) {
+            selectClientConversation(selectedConversation);
+        }
+    });
+
+    // Handle message submission
+    messageForm?.addEventListener(
+        "submit",
+        sendClientMessage
+    );
+
+    // Search conversations
+    conversationSearch?.addEventListener(
+        "input",
+        renderClientConversations
+    );
+
+    // Start listening for conversations
+    listenForClientConversations();
+}
+
+
 // ============================================
 // AUTHENTICATION STATE
 // ============================================
@@ -1204,7 +1707,8 @@ onAuthStateChanged(auth, async (user) => {
     if (!currentClient) {
         return;
     }
-
+    // Start the client messaging system
+    initializeClientMessaging();
     // Load the lawyer directory and the client's requests.
     await Promise.all([
         loadLawyers(),
