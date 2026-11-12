@@ -1712,3 +1712,329 @@ a {
     color: #66788A;
     font-size: 13px;
 }
+
+/* ============================================
+   CLIENT MESSAGING SYSTEM
+============================================ */
+
+.messaging-container {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    height: 560px;
+    min-height: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(11, 45, 82, 0.05);
+}
+
+/* CONVERSATIONS */
+
+.conversations-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    min-width: 0;
+}
+
+.conversations-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.conversations-header h3 {
+    color: var(--navy);
+    font-size: 16px;
+}
+
+.conversations-header span {
+    background: #f5f0df;
+    color: var(--navy);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.conversation-search {
+    padding: 15px;
+}
+
+.conversation-search input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+}
+
+.conversation-search input:focus {
+    border-color: var(--gold);
+}
+
+.conversations-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.conversation-item {
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #edf0f3;
+    transition: background 0.2s;
+}
+
+.conversation-item:hover,
+.conversation-item.active {
+    background: #f5f7fa;
+}
+
+.conversation-avatar {
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--gold-light);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+}
+
+.conversation-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversation-details h4 {
+    color: var(--navy);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.conversation-details p {
+    color: var(--text-medium);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* CHAT AREA */
+
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: #fff;
+}
+
+.chat-header {
+    min-height: 75px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+}
+
+.chat-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-placeholder > span {
+    font-size: 25px;
+}
+
+.chat-placeholder h3 {
+    color: var(--navy);
+    font-size: 15px;
+}
+
+.chat-placeholder p {
+    color: var(--text-medium);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.messages-list {
+     flex: 1;
+    min-height: 0;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #f8fafc;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 12px 15px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px 12px 12px 3px;
+    align-self: flex-start;
+    overflow-wrap: anywhere;
+}
+
+.message-bubble.mine {
+    align-self: flex-end;
+    background: rgb(1, 1, 109);
+    color: #fff;
+    border-color: var(--navy);
+    border-radius: 12px 12px 3px 12px;
+}
+
+.message-bubble p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.message-bubble small {
+    display: block;
+    font-size: 10px;
+    margin-top: 7px;
+    opacity: 0.7;
+}
+
+/* MESSAGE INPUT */
+
+.message-form {
+     display: flex;
+    flex-shrink: 0;
+    min-height: 75px;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.message-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+}
+
+.message-form input:focus {
+    border-color: var(--gold);
+}
+
+.message-form button {
+    background: rgb(0, 29, 196);
+    color: white;
+    border: none;
+    padding: 0 22px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.message-form button:hover {
+    background: var(--gold);
+    color: var(--navy);
+}
+
+.message-form button:disabled,
+.message-form input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* EMPTY STATES */
+
+.messages-empty {
+    padding: 30px 15px;
+    text-align: center;
+    color: var(--text-medium);
+}
+
+.messages-empty span {
+    font-size: 30px;
+}
+
+.messages-empty h4 {
+    color: var(--navy);
+    margin: 12px 0 7px;
+}
+
+.messages-empty p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+    .messaging-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 650px;
+    }
+
+    .conversations-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 230px;
+    }
+
+    .chat-panel {
+        min-height: 420px;
+    }
+
+    .message-bubble {
+        max-width: 90%;
+    }
+}
+
+.message-lawyer-btn {
+    width: 100%;
+    padding: 11px 15px;
+    margin-top: 9px;
+    border: 1px solid var(--navy);
+    border-radius: 8px;
+    background: rgb(222, 237, 133);
+    color: var(--navy);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.message-lawyer-btn:hover {
+    background: rgb(220, 217, 217);
+    color: rgb(107, 170, 237);
+}
+/* ============================================
+   UNREAD MESSAGE INDICATORS
+============================================ */
+
+.conversation-item.has-unread {
+    background: #FFF9E9;
+}
+
+.conversation-unread-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    border-radius: 50px;
+    background: #D9A928;
+    color: #061F36;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}

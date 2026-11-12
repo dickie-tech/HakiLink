@@ -105,22 +105,14 @@
 
             <span class="nav-badge" id="appointmentNavCount">0</span>
           </a>
-          <a
-            href="#messages"
-            class="nav-item">
-
+          <a href="#messages" class="nav-item">
             <span class="nav-icon">
               <img src="../assets/messages.png" alt="Messages">
             </span>
 
-            <span>
-              Messages
-            </span>
+            <span>Messages</span>
 
-            <span class="nav-badge">
-              0
-            </span>
-
+            <span class="nav-badge" id="messagesNavCount">0</span>
           </a>
 
           <p class="nav-label secondary">
@@ -610,6 +602,106 @@
               </div>
             </div>
           </section>
+
+          <!-- ========================================= -->
+          <!-- MESSAGES -->
+          <!-- ========================================= -->
+
+          <section class="dashboard-section" id="messages">
+
+            <div class="section-header">
+              <div>
+                <span class="eyebrow">STAY CONNECTED</span>
+                <h2>Messages</h2>
+                <p>Communicate directly with your legal professionals.</p>
+              </div>
+            </div>
+
+            <div class="messaging-container">
+
+              <!-- CONVERSATION SIDEBAR -->
+
+              <div class="conversations-panel">
+
+                <div class="conversations-header">
+                  <h3>Your Conversations</h3>
+                  <span id="conversationCount">0</span>
+                </div>
+
+                <div class="conversation-search">
+                  <input
+                    type="text"
+                    id="conversationSearch"
+                    placeholder="Search conversations...">
+                </div>
+
+                <div class="conversations-list" id="conversationsList">
+
+                  <div class="messages-empty">
+                    <span>💬</span>
+                    <h4>No conversations yet</h4>
+                    <p>Your conversations with lawyers will appear here.</p>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- CHAT AREA -->
+
+              <div class="chat-panel">
+
+                <!-- CHAT HEADER -->
+
+                <div class="chat-header" id="chatHeader">
+
+                  <div class="chat-placeholder">
+                    <span>⚖️</span>
+                    <div>
+                      <h3>Select a conversation</h3>
+                      <p>Choose a lawyer to start messaging.</p>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- MESSAGES -->
+
+                <div class="messages-list" id="messagesList">
+
+                  <div class="messages-empty">
+                    <span>✉️</span>
+                    <h4>Your messages will appear here</h4>
+                    <p>Select a conversation to view your messages.</p>
+                  </div>
+
+                </div>
+
+                <!-- MESSAGE INPUT -->
+
+                <form class="message-form" id="messageForm">
+
+                  <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Select a conversation first..."
+                    autocomplete="off"
+                    disabled>
+
+                  <button
+                    type="submit"
+                    id="sendMessageButton"
+                    disabled>
+                    Send →
+                  </button>
+
+                </form>
+              </div>
+
+            </div>
+
+          </section>
+
           <!-- ========================================= -->
           <!-- AI ASSISTANT -->
           <!-- ========================================= -->

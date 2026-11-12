@@ -303,15 +303,19 @@
                     messages.</p>
                 </div>
 
-                <form id="messageForm" class="message-form">
-                  <input type="text" id="messageInput"
-                    placeholder="Write a message..."
-                    maxlength="4000" autocomplete="off"
-                    aria-label="Write a message" disabled required>
-                  <button type="submit" id="sendMessageButton" disabled>
-                    Send →
+                <form class="message-form" id="messageForm">
+                  <textarea
+                    id="messageInput"
+                    placeholder="Type your message..."
+                    rows="1"
+                    maxlength="4000"
+                    required></textarea>
+
+                  <button type="submit" id="sendMessageButton">
+                    Send
                   </button>
                 </form>
+
               </div>
             </div>
           </section>

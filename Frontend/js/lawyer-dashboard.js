@@ -23,7 +23,8 @@ import {
     addDoc,
     serverTimestamp,
     Timestamp,
-    onSnapshot
+    onSnapshot,
+    increment
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -38,6 +39,7 @@ let appointments = [];
 let conversations = [];
 let selectedConversationId = null;
 let conversationLoadToken = 0;
+let unsubscribeConversations = null;
 
 
 // ============================================
@@ -53,7 +55,30 @@ const sidebar = $("sidebar");
 
 const profileForm = $("profileForm");
 const messageForm = $("messageForm");
+// ============================================
+// FLEXIBLE MESSAGE INPUT
+// ============================================
 
+const messageInput = $("messageInput");
+
+function resizeMessageInput() {
+    if (!messageInput) return;
+
+    messageInput.style.height = "auto";
+
+    messageInput.style.height =
+        `${Math.min(messageInput.scrollHeight, 140)}px`;
+}
+
+messageInput?.addEventListener("input", resizeMessageInput);
+
+messageInput?.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+
+        messageForm?.requestSubmit();
+    }
+});
 
 // ============================================
 // LAWYER NOTIFICATIONS
@@ -1292,40 +1317,54 @@ $("appointmentStatusFilter")?.addEventListener("change", renderAppointments);
 // updatedAt
 // Messages live in conversations/{id}/messages
 // ============================================
+function getLawyerUnreadCount() {
+                return conversations.reduce((total, conversation) => {
+                    return total + (Number(conversation.lawyerUnreadCount) || 0);
+                }, 0);
+            }
+function listenForLawyerConversations() {
 
-async function loadConversations() {
-    const container = $("conversationsList");
-
-    showEmpty(container, "Loading conversations...");
-
-    try {
-        const conversationQuery = query(
-            collection(db, "conversations"),
-            where("lawyerId", "==", currentUser.uid)
-        );
-
-        const snapshot = await getDocs(conversationQuery);
-
-        conversations = snapshot.docs.map((item) => ({
-            id: item.id,
-            ...item.data()
-        }));
-
-        conversations.sort((a, b) => {
-            return toMillis(b.updatedAt) - toMillis(a.updatedAt);
-        });
-
-        renderConversations();
-        updateStatistics();
-
-    } catch (error) {
-        console.error("Could not load conversations:", error);
-
-        showEmpty(
-            container,
-            "Messages could not be loaded. Check your Firestore rules and conversation data."
-        );
+    if (unsubscribeConversations) {
+        unsubscribeConversations();
     }
+
+    const conversationQuery = query(
+        collection(db, "conversations"),
+        where("lawyerId", "==", currentUser.uid)
+    );
+
+    unsubscribeConversations = onSnapshot(
+        conversationQuery,
+
+        snapshot => {
+
+            conversations = snapshot.docs.map(item => ({
+                id: item.id,
+                ...item.data()
+            }));
+
+            conversations.sort((a, b) => {
+                return toMillis(b.updatedAt) - toMillis(a.updatedAt);
+            });
+
+            
+
+            renderConversations();
+            updateStatistics();
+        },
+
+        error => {
+            console.error(
+                "Could not listen for conversations:",
+                error
+            );
+
+            showMessage(
+                "Unable to update your conversations.",
+                "error"
+            );
+        }
+    );
 }
 
 function renderConversations() {
@@ -1344,23 +1383,44 @@ function renderConversations() {
         );
 
         button.type = "button";
-        button.appendChild(element(
+
+        // Group conversation details together.
+        const info = element("div", "conversation-info");
+
+        info.appendChild(element(
             "strong",
             "",
             conversation.clientName || "HakiLink client"
         ));
 
-        button.appendChild(element(
+        info.appendChild(element(
             "span",
             "",
             conversation.lastMessage || "No messages yet"
         ));
 
-        button.appendChild(element(
+        info.appendChild(element(
             "p",
             "",
             formatDate(conversation.updatedAt)
         ));
+
+        button.appendChild(info);
+
+        // Display unread count on the right.
+        const unread = Number(conversation.lawyerUnreadCount) || 0;
+
+        if (unread > 0) {
+            button.classList.add("has-unread");
+
+            button.appendChild(
+                element(
+                    "span",
+                    "conversation-unread-count",
+                    unread > 99 ? "99+" : String(unread)
+                )
+            );
+        }
 
         button.addEventListener("click", () => {
             selectConversation(conversation);
@@ -1372,8 +1432,23 @@ function renderConversations() {
     container.replaceChildren(...items);
 }
 
+
 async function selectConversation(conversation) {
     selectedConversationId = conversation.id;
+    // Mark messages as read by the lawyer.
+        try {
+            await updateDoc(
+                doc(db, "conversations", conversation.id),
+                {
+                    lawyerUnreadCount: 0
+                }
+            );
+
+            conversation.lawyerUnreadCount = 0;
+
+        } catch (error) {
+            console.error("Could not reset lawyer unread count:", error);
+        }
     const loadToken = ++conversationLoadToken;
 
     renderConversations();
@@ -1487,7 +1562,7 @@ messageForm?.addEventListener("submit", async (event) => {
     if (!text) return;
 
     const conversation = conversations.find(
-        (item) => item.id === selectedConversationId
+        item => item.id === selectedConversationId
     );
 
     if (!conversation) return;
@@ -1495,6 +1570,9 @@ messageForm?.addEventListener("submit", async (event) => {
     sendButton.disabled = true;
 
     try {
+        // STEP 1: Save the actual message.
+        console.log("Step 1: Saving message...");
+
         await addDoc(
             collection(
                 db,
@@ -1509,29 +1587,35 @@ messageForm?.addEventListener("submit", async (event) => {
             }
         );
 
+        console.log("Step 1 successful: Message saved.");
+
+        // STEP 2: Update conversation and unread count.
+        console.log("Step 2: Updating conversation...");
+
         await updateDoc(
             doc(db, "conversations", conversation.id),
             {
                 lastMessage: text,
-                updatedAt: serverTimestamp()
+                updatedAt: serverTimestamp(),
+                clientUnreadCount: increment(1)
             }
         );
 
+        console.log("Step 2 successful: Conversation updated.");
+
         input.value = "";
-
-        conversation.lastMessage = text;
-        conversation.updatedAt = new Date();
-
-        await selectConversation(conversation);
-        renderConversations();
+        resizeMessageInput();
 
     } catch (error) {
-        console.error("Could not send message:", error);
+        console.error("Message operation failed:", error);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
 
         showMessage(
-            "Your message could not be sent. Check your Firestore rules and try again.",
+            "A message operation failed. Check the console for details.",
             "error"
         );
+
     } finally {
         sendButton.disabled = false;
     }
@@ -1561,7 +1645,7 @@ function updateStatistics() {
     setText("conversationsCount", conversations.length);
 
     setText("requestNavCount", pendingCount);
-    setText("messageNavCount", conversations.length);
+    setText("messageNavCount", getLawyerUnreadCount());
 }
 
 
@@ -1622,7 +1706,7 @@ onAuthStateChanged(auth, async (user) => {
         await Promise.allSettled([
             loadRequests(),
             loadAppointments(),
-            loadConversations()
+            listenForLawyerConversations()
         ]);
 
     } catch (error) {
