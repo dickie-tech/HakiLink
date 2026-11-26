@@ -10,7 +10,11 @@ import {
     doc,
     getDoc,
     setDoc,
-    serverTimestamp
+    serverTimestamp,
+    collection,
+    getDocs,
+    query,
+    where
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -51,7 +55,25 @@ const firmProfileContent =
 
 let currentUser = null;
 let currentFirmData = null;
+let firmApplications = [];
 
+const firmApplicationsList =
+    document.getElementById("firmApplicationsList");
+
+const applicationCount =
+    document.getElementById("applicationCount");
+
+const totalApplications =
+    document.getElementById("totalApplications");
+
+const pendingApplications =
+    document.getElementById("pendingApplications");
+
+const acceptedApplications =
+    document.getElementById("acceptedApplications");
+
+const refreshApplicationsButton =
+    document.getElementById("refreshApplicationsButton");
 
 /* =========================================
    DASHBOARD NAVIGATION
@@ -171,6 +193,8 @@ async function loadFirmProfile(user) {
 
         // Load public firm profile editor
         await loadPublicFirmProfile();
+        // Load incoming lawyer applications
+        await loadFirmApplications();
 
     } catch (error) {
 
@@ -276,6 +300,255 @@ async function loadPublicFirmProfile() {
         );
 
     }
+
+}
+/* =========================================
+   LOAD LAWYER APPLICATIONS
+========================================= */
+
+async function loadFirmApplications() {
+
+    if (!currentUser || !firmApplicationsList) {
+        return;
+    }
+
+    try {
+
+        firmApplicationsList.innerHTML = `
+            <p>Loading lawyer applications...</p>
+        `;
+
+        // The firm ID must match the ID used
+        // when the lawyer submitted the application.
+
+        const applicationsQuery = query(
+            collection(db, "firmApplications"),
+            where("firmId", "==", currentUser.uid)
+        );
+
+        const snapshot = await getDocs(applicationsQuery);
+
+        firmApplications = snapshot.docs.map(documentSnapshot => ({
+            id: documentSnapshot.id,
+            ...documentSnapshot.data()
+        }));
+
+        // Sort newest applications first.
+        firmApplications.sort((a, b) => {
+            const dateA = a.submittedAt?.toMillis?.() || 0;
+            const dateB = b.submittedAt?.toMillis?.() || 0;
+
+            return dateB - dateA;
+        });
+
+        updateApplicationStatistics();
+
+        renderFirmApplications();
+
+        console.log(
+            "Firm applications loaded:",
+            firmApplications
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error loading firm applications:",
+            error
+        );
+
+        firmApplicationsList.innerHTML = `
+            <p class="profile-error">
+                Unable to load applications.
+                Please check your permissions and try again.
+            </p>
+        `;
+
+        showToast(
+            "Could not load lawyer applications."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   UPDATE APPLICATION STATISTICS
+========================================= */
+
+function updateApplicationStatistics() {
+
+    const total = firmApplications.length;
+
+    const pending = firmApplications.filter(
+        application => application.status === "pending"
+    ).length;
+
+    const accepted = firmApplications.filter(
+        application => application.status === "accepted"
+    ).length;
+
+    if (applicationCount) {
+        applicationCount.textContent = pending;
+    }
+
+    if (totalApplications) {
+        totalApplications.textContent = total;
+    }
+
+    if (pendingApplications) {
+        pendingApplications.textContent = pending;
+    }
+
+    if (acceptedApplications) {
+        acceptedApplications.textContent = accepted;
+    }
+
+}
+
+
+/* =========================================
+   RENDER FIRM APPLICATIONS
+========================================= */
+
+function renderFirmApplications() {
+
+    if (!firmApplicationsList) return;
+
+    if (firmApplications.length === 0) {
+
+        firmApplicationsList.innerHTML = `
+            <div class="dashboard-panel">
+                <h3>No Applications Yet</h3>
+
+                <p>
+                    Applications from lawyers who want to join
+                    your firm will appear here.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    firmApplicationsList.innerHTML = firmApplications.map(application => {
+
+        const lawyerName = escapeApplicationHTML(
+            application.lawyerName || "Unnamed Lawyer"
+        );
+
+        const practiceArea = escapeApplicationHTML(
+            application.practiceArea || "Not specified"
+        );
+
+        const status = escapeApplicationHTML(
+            application.status || "pending"
+        );
+
+        const qualifications = escapeApplicationHTML(
+            application.qualifications || "Not provided"
+        );
+
+        const experience = escapeApplicationHTML(
+            application.experience || "Not provided"
+        );
+
+        const coverLetter = escapeApplicationHTML(
+            application.coverLetter || "No cover letter provided."
+        );
+
+        const date = application.submittedAt?.toDate
+            ? application.submittedAt.toDate().toLocaleDateString()
+            : "Date unavailable";
+
+        return `
+            <div class="dashboard-panel application-card">
+
+                <div class="application-header">
+
+                    <div>
+                        <h3>${lawyerName}</h3>
+
+                        <p>
+                            Practice Area: ${practiceArea}
+                        </p>
+
+                        <p>
+                            Submitted: ${date}
+                        </p>
+                    </div>
+
+                    <span class="application-status">
+                        ${status.toUpperCase()}
+                    </span>
+
+                </div>
+
+                <div class="application-details">
+
+                    <h4>Qualifications</h4>
+                    <p>${qualifications}</p>
+
+                    <h4>Professional Experience</h4>
+                    <p>${experience}</p>
+
+                    <h4>Cover Letter</h4>
+                    <p>${coverLetter}</p>
+
+                </div>
+
+                <div class="application-documents">
+
+                    <h4>Supporting Documents</h4>
+
+                    ${
+                        Array.isArray(application.documents) &&
+                        application.documents.length > 0
+                            ? application.documents.map(document => `
+                                <p>
+                                    ${escapeApplicationHTML(
+                                        document.fileName || document.name || "Uploaded document"
+                                    )}
+                                    <span>
+                                        (${escapeApplicationHTML(
+                                            document.type || document.documentType || "Document"
+                                        )})
+                                    </span>
+                                </p>
+                            `).join("")
+                            : "<p>No document information available.</p>"
+                    }
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+
+}
+
+
+/* =========================================
+   ESCAPE USER-SUPPLIED CONTENT
+========================================= */
+
+function escapeApplicationHTML(value) {
+
+    return String(value).replace(/[&<>"']/g, character => {
+
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[character];
+
+    });
 
 }
 
@@ -791,3 +1064,7 @@ function showToast(message) {
 ========================================= */
 
 openSection("overview");
+refreshApplicationsButton?.addEventListener(
+    "click",
+    loadFirmApplications
+);
