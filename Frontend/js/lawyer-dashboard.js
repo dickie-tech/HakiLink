@@ -26,6 +26,25 @@ import {
     onSnapshot,
     increment
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+
+// ============================================
+// PRIVATE DOCUMENT STORAGE
+// ============================================
+
+const SUPABASE_URL = "https://uwzuzdvidkllbsolmhdv.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2Or4n0jwCAlrNpSVSDAi2Q_4rn2fe5Y";
+
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_DOCUMENTS = 10;
+const STORAGE_BUCKET = "lawyer-qualification-documents";
 
 
 // ============================================
@@ -120,7 +139,83 @@ function clearMessage() {
     pageMessage.className = "page-message";
 }
 
+// ============================================
+// SECURE APPLICATION API HELPERS
+// ============================================
 
+async function applicationApi(endpoint, body) {
+    if (!currentUser) {
+        throw new Error("Please log in again.");
+    }
+
+    const token = await currentUser.getIdToken();
+
+    const response = await fetch(`/api/${endpoint}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(
+            result.error || result.message || "The request could not be completed."
+        );
+    }
+
+    return result;
+}
+
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+
+function validateApplicationFile(file, documentType) {
+    const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png"
+    ];
+
+    if (!file) {
+        throw new Error("Please select a document.");
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error(`${file.name} exceeds the 5 MB limit.`);
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+        throw new Error("Only PDF, JPG and PNG documents are accepted.");
+    }
+
+    if (documentType === "cv" && file.type !== "application/pdf") {
+        throw new Error("Your CV must be uploaded as a PDF.");
+    }
+}
+
+
+function getApplicationId(result) {
+    const id = result.applicationId || result.draftId;
+
+    if (!id) {
+        throw new Error("The server did not return an application draft ID.");
+    }
+
+    return id;
+}
 // ============================================
 // SAFE DOM HELPERS
 // ============================================
@@ -462,7 +557,9 @@ const sectionTitles = {
     requests: "Client Requests",
     appointments: "Appointments",
     messages: "Messages",
-    profile: "Professional Profile"
+    profile: "Professional Profile",
+    "find-firms": "Find Law Firms",
+    "my-applications": "My Applications"
 };
 
 function openSection(sectionId) {
@@ -1309,6 +1406,888 @@ function renderAppointments() {
     }
 }
 
+
+// ============================================
+// LAW FIRM DIRECTORY AND APPLICATIONS
+// ============================================
+
+let publicFirms = [];
+let firmApplications = [];
+
+// Load public law firm profiles
+async function loadPublicFirms() {
+    const container = $("firmsList");
+
+    showEmpty(container, "Loading law firms...");
+
+    try {
+        const snapshot = await getDocs(
+            collection(db, "publicFirms")
+        );
+
+        publicFirms = snapshot.docs.map(item => ({
+            id: item.id,
+            ...item.data()
+        }));
+
+        publicFirms.sort((a, b) =>
+            String(a.firmName || "").localeCompare(
+                String(b.firmName || "")
+            )
+        );
+
+        renderPublicFirms();
+
+    } catch (error) {
+        console.error("Could not load law firms:", error);
+
+        showEmpty(
+            container,
+            "Law firms could not be loaded. Check your Firestore rules."
+        );
+    }
+}
+
+
+// Render the available law firms
+function renderPublicFirms() {
+    const container = $("firmsList");
+
+    if (!container) return;
+
+    const searchTerm = (
+        $("firmSearch")?.value || ""
+    ).trim().toLowerCase();
+
+    const filtered = publicFirms.filter(firm => {
+        const areas = Array.isArray(firm.practiceAreas)
+            ? firm.practiceAreas.join(" ")
+            : "";
+
+        const searchable = [
+            firm.firmName,
+            firm.location,
+            firm.description,
+            areas
+        ].join(" ").toLowerCase();
+
+        return searchable.includes(searchTerm);
+    });
+
+    if (!filtered.length) {
+        showEmpty(
+            container,
+            publicFirms.length
+                ? "No law firms match your search."
+                : "No law firms have published their profiles yet."
+        );
+        return;
+    }
+
+    const cards = filtered.map(firm => {
+        const card = element("article", "data-item");
+        const main = element("div", "data-item-main");
+
+        main.appendChild(
+            element("h3", "", firm.firmName || "Law Firm")
+        );
+
+        main.appendChild(
+            element(
+                "p",
+                "",
+                firm.location || "Location not provided"
+            )
+        );
+
+        main.appendChild(
+            element(
+                "p",
+                "",
+                firm.description || "No firm description available."
+            )
+        );
+
+        const areas = Array.isArray(firm.practiceAreas)
+            ? firm.practiceAreas
+            : [];
+
+        main.appendChild(
+            element(
+                "p",
+                "",
+                areas.length
+                    ? `Practice areas: ${areas.join(", ")}`
+                    : "Practice areas not provided"
+            )
+        );
+
+        const applyButton = element(
+            "button",
+            "small-button accept",
+            "Apply to Join"
+        );
+
+        applyButton.type = "button";
+
+        applyButton.addEventListener("click", () => {
+            showFirmApplicationForm(firm, card);
+        });
+
+        main.appendChild(applyButton);
+        card.appendChild(main);
+
+        return card;
+    });
+
+    container.replaceChildren(...cards);
+    if (firmApplications.length) {
+    renderMyApplications();
+    }
+}
+
+
+// Display the application form for a selected firm
+// ============================================
+// DISPLAY LAW FIRM APPLICATION FORM
+// ============================================
+
+async function showFirmApplicationForm(firm, card) {
+
+    const existingForm = card.querySelector(".firm-application-form");
+
+    if (existingForm) {
+        existingForm.remove();
+        return;
+    }
+
+    if (!currentUser || !currentProfile) return;
+
+    try {
+        showMessage("Preparing your application...", "info");
+
+        // Create a private draft through the backend.
+        const draftResult = await applicationApi(
+            "create-application-draft",
+            {
+                firmId: firm.id
+            }
+        );
+
+        const applicationId = getApplicationId(draftResult);
+
+        const form = element("form", "firm-application-form");
+
+        const uploadedDocuments = [];
+
+        form.dataset.applicationId = applicationId;
+
+        form.appendChild(
+            element("h4", "", `Apply to ${firm.firmName}`)
+        );
+
+        form.appendChild(
+            element(
+                "p",
+                "",
+                "Complete your application and upload the required qualification documents."
+            )
+        );
+
+        // ------------------------------------
+        // TEXT FIELDS
+        // ------------------------------------
+
+        const fields = [
+            {
+                label: "Qualifications",
+                name: "qualifications",
+                placeholder: "e.g. LLB, University of Nairobi",
+                type: "input",
+                maxLength: 2000
+            },
+            {
+                label: "Professional experience",
+                name: "experience",
+                placeholder: "Describe your relevant legal experience",
+                type: "textarea",
+                maxLength: 5000
+            },
+            {
+                label: "Cover letter",
+                name: "coverLetter",
+                placeholder: "Explain why you would like to join this firm",
+                type: "textarea",
+                maxLength: 3000
+            }
+        ];
+
+        fields.forEach(field => {
+            const group = element("div", "feedback-group");
+
+            const label = element(
+                "label",
+                "feedback-label",
+                field.label
+            );
+
+            const input = element(
+                field.type === "textarea" ? "textarea" : "input",
+                "feedback-input"
+            );
+
+            input.name = field.name;
+            input.required = true;
+            input.maxLength = field.maxLength;
+            input.placeholder = field.placeholder;
+
+            if (field.type === "textarea") {
+                input.rows = 4;
+            }
+
+            group.append(label, input);
+            form.appendChild(group);
+        });
+
+        // ------------------------------------
+        // DOCUMENT UPLOAD SECTION
+        // ------------------------------------
+
+        const documentSection = element("div", "feedback-group");
+
+        documentSection.appendChild(
+            element("h4", "", "Qualification Documents")
+        );
+
+        documentSection.appendChild(
+            element(
+                "p",
+                "",
+                "PDF, JPG or PNG files are accepted. Maximum 5 MB per file. Your CV must be PDF."
+            )
+        );
+
+        const documentList = element("div", "uploaded-document-list");
+
+        documentSection.appendChild(documentList);
+
+        const documentTypes = [
+            {
+                type: "cv",
+                label: "CV / Resume",
+                required: true,
+                multiple: false
+            },
+            {
+                type: "academic_certificate",
+                label: "Academic Certificate",
+                required: true,
+                multiple: false
+            },
+            {
+                type: "transcript",
+                label: "Academic Transcript (Optional)",
+                required: false,
+                multiple: true
+            },
+            {
+                type: "additional_certificate",
+                label: "Additional Professional Certificates / References (Optional)",
+                required: false,
+                multiple: true
+            }
+        ];
+
+        function renderUploadedDocuments() {
+            documentList.replaceChildren();
+
+            if (!uploadedDocuments.length) {
+                documentList.appendChild(
+                    element(
+                        "p",
+                        "empty-state",
+                        "No documents uploaded yet."
+                    )
+                );
+                return;
+            }
+
+            uploadedDocuments.forEach(document => {
+                const item = element("div", "uploaded-document-item");
+
+                const details = element("div", "uploaded-document-details");
+
+                details.appendChild(
+                    element("strong", "", document.fileName)
+                );
+
+                details.appendChild(
+                    element(
+                        "small",
+                        "",
+                        `${document.documentType.replaceAll("_", " ")} · ${formatFileSize(document.fileSize)}`
+                    )
+                );
+
+                const removeButton = element(
+                    "button",
+                    "small-button decline",
+                    "Remove"
+                );
+
+                removeButton.type = "button";
+
+                removeButton.addEventListener("click", async () => {
+                    removeButton.disabled = true;
+                    removeButton.textContent = "Removing...";
+
+                    try {
+                        await applicationApi(
+                            "delete-application-document",
+                            {
+                                applicationId,
+                                documentId: document.documentId
+                            }
+                        );
+
+                        const index = uploadedDocuments.findIndex(
+                            item => item.documentId === document.documentId
+                        );
+
+                        if (index !== -1) {
+                            uploadedDocuments.splice(index, 1);
+                        }
+
+                        renderUploadedDocuments();
+
+                        showMessage("Document removed successfully.", "success");
+
+                    } catch (error) {
+                        console.error("Document removal failed:", error);
+
+                        showMessage(
+                            `Could not remove document: ${error.message}`,
+                            "error"
+                        );
+
+                        removeButton.disabled = false;
+                        removeButton.textContent = "Remove";
+                    }
+                });
+
+                item.append(details, removeButton);
+                documentList.appendChild(item);
+            });
+        }
+
+        documentTypes.forEach(documentType => {
+            const group = element("div", "feedback-group");
+
+            const label = element(
+                "label",
+                "feedback-label",
+                documentType.label + (documentType.required ? " *" : "")
+            );
+
+            const input = element("input", "feedback-input");
+
+            input.type = "file";
+            input.accept = documentType.type === "cv"
+                ? ".pdf,application/pdf"
+                : ".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png";
+
+            input.multiple = documentType.multiple;
+
+            label.appendChild(input);
+            group.appendChild(label);
+
+            const uploadStatus = element("p", "item-date", "");
+
+            group.appendChild(uploadStatus);
+
+            input.addEventListener("change", async () => {
+                const files = Array.from(input.files || []);
+
+                if (!files.length) return;
+
+                const existingOfType = uploadedDocuments.filter(
+                    item => item.documentType === documentType.type
+                );
+
+                if (
+                    !documentType.multiple &&
+                    existingOfType.length > 0
+                ) {
+                    showMessage(
+                        `You have already uploaded your ${documentType.label}. Remove it before uploading another.`,
+                        "error"
+                    );
+
+                    input.value = "";
+                    return;
+                }
+
+                if (
+                    uploadedDocuments.length + files.length > MAX_DOCUMENTS
+                ) {
+                    showMessage(
+                        `You can upload a maximum of ${MAX_DOCUMENTS} documents.`,
+                        "error"
+                    );
+
+                    input.value = "";
+                    return;
+                }
+
+                input.disabled = true;
+
+                try {
+                    for (const file of files) {
+                        validateApplicationFile(file, documentType.type);
+
+                        uploadStatus.textContent =
+                            `Uploading ${file.name}...`;
+
+                        // 1. Request temporary upload permission.
+                        const uploadPermission = await applicationApi(
+                            "create-upload-url",
+                            {
+                                applicationId,
+                                documentType: documentType.type,
+                                fileName: file.name,
+                                mimeType: file.type,
+                                fileSize: file.size
+                            }
+                        );
+
+                        const storagePath = uploadPermission.storagePath;
+                        const uploadToken = uploadPermission.uploadToken;
+
+                        if (!storagePath || !uploadToken) {
+                            throw new Error(
+                                "The server did not return valid upload permission."
+                            );
+                        }
+
+                        // 2. Upload directly to the private Supabase bucket.
+                        const { error: uploadError } = await supabase.storage
+                            .from(uploadPermission.bucket || STORAGE_BUCKET)
+                            .uploadToSignedUrl(
+                                storagePath,
+                                uploadToken,
+                                file
+                            );
+
+                        if (uploadError) {
+                            throw uploadError;
+                        }
+
+                        // 3. Register and verify the uploaded document.
+                        const registration = await applicationApi(
+                            "register-application-document",
+                            {
+                                applicationId,
+                                storagePath,
+                                documentType: documentType.type,
+                                fileName: file.name,
+                                mimeType: file.type,
+                                fileSize: file.size
+                            }
+                        );
+
+                        const savedDocument =
+                            registration.document || registration;
+
+                        const documentId =
+                            savedDocument.documentId ||
+                            registration.documentId ||
+                            storagePath.split("/").pop().split(".")[0];
+
+                        uploadedDocuments.push({
+                            documentId,
+                            documentType: documentType.type,
+                            fileName: file.name,
+                            fileSize: file.size,
+                            mimeType: file.type,
+                            storagePath
+                        });
+
+                        renderUploadedDocuments();
+                    }
+
+                    uploadStatus.textContent = "Upload complete.";
+
+                    showMessage(
+                        "Your document(s) uploaded successfully.",
+                        "success"
+                    );
+
+                } catch (error) {
+                    console.error("Document upload failed:", error);
+
+                    uploadStatus.textContent = "";
+
+                    showMessage(
+                        `Document upload failed: ${error.message}`,
+                        "error"
+                    );
+
+                } finally {
+                    input.disabled = false;
+                    input.value = "";
+                }
+            });
+
+            documentSection.appendChild(group);
+        });
+
+        renderUploadedDocuments();
+
+        form.appendChild(documentSection);
+
+        // ------------------------------------
+        // FORM ACTIONS
+        // ------------------------------------
+
+        const actions = element("div", "item-actions");
+
+        const submitButton = element(
+            "button",
+            "small-button accept",
+            "Submit Application"
+        );
+
+        submitButton.type = "submit";
+
+        const cancelButton = element(
+            "button",
+            "small-button decline",
+            "Cancel"
+        );
+
+        cancelButton.type = "button";
+
+        cancelButton.addEventListener("click", () => {
+            form.remove();
+        });
+
+        actions.append(submitButton, cancelButton);
+        form.appendChild(actions);
+
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            await submitFirmApplication(
+                firm,
+                form,
+                submitButton,
+                uploadedDocuments
+            );
+        });
+
+        card.appendChild(form);
+
+        clearMessage();
+
+    } catch (error) {
+        console.error("Could not prepare application:", error);
+
+        showMessage(
+            `Could not prepare your application: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+
+// ============================================
+// SUBMIT APPLICATION
+// ============================================
+
+async function submitFirmApplication(
+    firm,
+    form,
+    button,
+    uploadedDocuments
+) {
+    if (!currentUser || !currentProfile) return;
+
+    const lawyerName = currentProfile.fullName || "";
+    const practiceArea = currentProfile.practiceArea || "";
+    const barAdmissionNumber =
+        currentProfile.barAdmissionNumber || "";
+
+    if (!lawyerName || !practiceArea || !barAdmissionNumber) {
+        showMessage(
+            "Complete your professional profile, including your Bar Admission Number, before applying.",
+            "error"
+        );
+        return;
+    }
+
+    const qualifications =
+        form.elements.qualifications.value.trim();
+
+    const experience =
+        form.elements.experience.value.trim();
+
+    const coverLetter =
+        form.elements.coverLetter.value.trim();
+
+    if (!qualifications || !experience || !coverLetter) {
+        showMessage(
+            "Please complete all application fields.",
+            "error"
+        );
+        return;
+    }
+
+    const hasCV = uploadedDocuments.some(
+        item => item.documentType === "cv"
+    );
+
+    const hasAcademicCertificate = uploadedDocuments.some(
+        item => item.documentType === "academic_certificate"
+    );
+
+    if (!hasCV || !hasAcademicCertificate) {
+        showMessage(
+            "Please upload both your CV and at least one academic certificate.",
+            "error"
+        );
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+
+    try {
+        const applicationId = form.dataset.applicationId;
+
+        await applicationApi(
+            "submit-firm-application",
+            {
+                applicationId,
+                qualifications,
+                experience,
+                coverLetter
+            }
+        );
+
+        form.remove();
+
+        await loadMyApplications();
+
+        showMessage(
+            `Your application to ${firm.firmName} was submitted successfully.`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error("Application submission failed:", error);
+
+        showMessage(
+            `Could not submit your application: ${error.message}`,
+            "error"
+        );
+
+    } finally {
+        button.disabled = false;
+        button.textContent = "Submit Application";
+    }
+}
+
+
+// Load applications submitted by the logged-in lawyer
+async function loadMyApplications() {
+
+    const container = $("applicationsList");
+
+    showEmpty(container, "Loading your applications...");
+
+    try {
+        const applicationQuery = query(
+            collection(db, "firmApplications"),
+            where("lawyerId", "==", currentUser.uid)
+        );
+
+        const snapshot = await getDocs(applicationQuery);
+
+        firmApplications = snapshot.docs.map(item => ({
+            id: item.id,
+            ...item.data()
+        }));
+
+        firmApplications.sort((a, b) =>
+            toMillis(b.submittedAt) - toMillis(a.submittedAt)
+        );
+
+        renderMyApplications();
+
+    } catch (error) {
+        console.error("Could not load firm applications:", error);
+
+        showEmpty(
+            container,
+            "Your applications could not be loaded. Check your Firestore rules."
+        );
+    }
+}
+
+
+// Render the lawyer's applications
+function renderMyApplications() {
+
+    const container = $("applicationsList");
+
+    if (!container) return;
+
+    if (!firmApplications.length) {
+        showEmpty(
+            container,
+            "You have not applied to any law firms yet."
+        );
+        return;
+    }
+
+    const cards = firmApplications.map(application => {
+
+        const card = element("article", "data-item");
+        const main = element("div", "data-item-main");
+
+        const firm = publicFirms.find(
+            item => item.id === application.firmId
+        );
+
+        main.appendChild(
+            element(
+                "h3",
+                "",
+                firm?.firmName || "Law Firm"
+            )
+        );
+
+        main.appendChild(
+            element(
+                "p",
+                "",
+                `Applied: ${formatDate(application.submittedAt)}`
+            )
+        );
+
+        main.appendChild(
+            element(
+                "p",
+                "",
+                `Practice area: ${application.practiceArea || "Not provided"}`
+            )
+        );
+
+        main.appendChild(
+            makeStatus(application.status)
+        );
+
+        if (application.decisionNote) {
+            const note = element("div", "saved-feedback");
+
+            note.appendChild(
+                element("strong", "", "Firm response")
+            );
+
+            note.appendChild(
+                element("p", "", application.decisionNote)
+            );
+
+            main.appendChild(note);
+        }
+
+        if (normaliseStatus(application.status) === "pending") {
+
+            const withdrawButton = element(
+                "button",
+                "small-button decline",
+                "Withdraw Application"
+            );
+
+            withdrawButton.type = "button";
+
+            withdrawButton.addEventListener("click", () => {
+                withdrawFirmApplication(
+                    application,
+                    withdrawButton
+                );
+            });
+
+            main.appendChild(withdrawButton);
+        }
+
+        card.appendChild(main);
+
+        return card;
+    });
+
+    container.replaceChildren(...cards);
+}
+
+
+// Withdraw a pending application
+async function withdrawFirmApplication(application, button) {
+
+    if (!currentUser) return;
+
+    if (normaliseStatus(application.status) !== "pending") {
+        showMessage(
+            "Only pending applications can be withdrawn.",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = window.confirm(
+        "Are you sure you want to withdraw this application?"
+    );
+
+    if (!confirmed) return;
+
+    button.disabled = true;
+    button.textContent = "Withdrawing...";
+
+    try {
+        await updateDoc(
+            doc(db, "firmApplications", application.id),
+            {
+                status: "withdrawn",
+                withdrawnAt: serverTimestamp()
+            }
+        );
+
+        application.status = "withdrawn";
+
+        renderMyApplications();
+
+        showMessage(
+            "Your application has been withdrawn.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error("Could not withdraw application:", error);
+
+        showMessage(
+            `Could not withdraw application: ${error.message}`,
+            "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "Withdraw Application";
+    }
+}
+
+
+// Search law firms
+$("firmSearch")?.addEventListener("input", renderPublicFirms);
+
+
 $("appointmentSearch")?.addEventListener("input", renderAppointments);
 $("appointmentStatusFilter")?.addEventListener("change", renderAppointments);
 
@@ -1731,7 +2710,9 @@ onAuthStateChanged(auth, async (user) => {
         await Promise.allSettled([
             loadRequests(),
             loadAppointments(),
-            listenForLawyerConversations()
+            listenForLawyerConversations(),
+            loadPublicFirms(),
+            loadMyApplications()
         ]);
 
     } catch (error) {
