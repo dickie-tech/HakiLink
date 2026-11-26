@@ -552,6 +552,11 @@ document.addEventListener("click", event => {
 // NAVIGATION
 // ============================================
 
+
+// ============================================
+// NAVIGATION AND RESPONSIVE SIDEBAR
+// ============================================
+
 const sectionTitles = {
     overview: "Overview",
     requests: "Client Requests",
@@ -562,40 +567,166 @@ const sectionTitles = {
     "my-applications": "My Applications"
 };
 
+
+// ============================================
+// OPEN DASHBOARD SECTION
+// ============================================
+
 function openSection(sectionId) {
+
     const target = $(sectionId);
 
     if (!target || !sectionTitles[sectionId]) return;
 
+    // Hide all dashboard sections.
     document.querySelectorAll(".dashboard-section")
-        .forEach((section) => section.classList.remove("active"));
+        .forEach(section => {
+            section.classList.remove("active");
+        });
 
+    // Display selected section.
     target.classList.add("active");
 
+    // Update active navigation button.
     document.querySelectorAll("[data-section]")
-        .forEach((button) => {
+        .forEach(button => {
+
             button.classList.toggle(
                 "active",
                 button.dataset.section === sectionId
             );
+
         });
 
+    // Update page heading.
     setText("pageTitle", sectionTitles[sectionId]);
 
-    sidebar?.classList.remove("open");
     clearMessage();
+
+    // Automatically close mobile sidebar.
+    closeSidebar();
 }
 
-document.querySelectorAll("[data-section]").forEach((button) => {
-    button.addEventListener("click", () => {
-        openSection(button.dataset.section);
+
+// ============================================
+// OPEN SIDEBAR
+// ============================================
+
+function openSidebar() {
+
+    if (!sidebar) return;
+
+    sidebar.classList.add("open");
+
+    menuButton?.setAttribute(
+        "aria-expanded",
+        "true"
+    );
+}
+
+
+// ============================================
+// CLOSE SIDEBAR
+// ============================================
+
+function closeSidebar() {
+
+    if (!sidebar) return;
+
+    sidebar.classList.remove("open");
+
+    menuButton?.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+}
+
+
+// ============================================
+// TOGGLE SIDEBAR
+// ============================================
+
+function toggleSidebar() {
+
+    if (!sidebar) return;
+
+    if (sidebar.classList.contains("open")) {
+
+        closeSidebar();
+
+    } else {
+
+        openSidebar();
+
+    }
+}
+
+
+// ============================================
+// HAMBURGER BUTTON
+// ============================================
+
+menuButton?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    toggleSidebar();
+
+});
+
+
+// ============================================
+// SIDEBAR NAVIGATION BUTTONS
+// ============================================
+
+document.querySelectorAll("[data-section]")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const sectionId = button.dataset.section;
+
+            openSection(sectionId);
+
+        });
+
     });
+
+
+// ============================================
+// CLOSE SIDEBAR WHEN CLICKING OUTSIDE
+// ============================================
+
+document.addEventListener("click", event => {
+
+    if (!sidebar?.classList.contains("open")) return;
+
+    const clickedInsideSidebar = sidebar.contains(event.target);
+
+    const clickedMenuButton = menuButton?.contains(event.target);
+
+    if (!clickedInsideSidebar && !clickedMenuButton) {
+
+        closeSidebar();
+
+    }
+
 });
 
-menuButton?.addEventListener("click", () => {
-    sidebar?.classList.toggle("open");
-});
 
+// ============================================
+// CLOSE SIDEBAR USING ESCAPE
+// ============================================
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+
+        closeSidebar();
+
+    }
+
+});
 
 // ============================================
 // LOAD LAWYER PROFILE
