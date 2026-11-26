@@ -413,6 +413,11 @@ function updateApplicationStatistics() {
    RENDER FIRM APPLICATIONS
 ========================================= */
 
+
+/* =========================================
+   RENDER FIRM APPLICATIONS
+========================================= */
+
 function renderFirmApplications() {
 
     if (!firmApplicationsList) return;
@@ -422,7 +427,6 @@ function renderFirmApplications() {
         firmApplicationsList.innerHTML = `
             <div class="dashboard-panel">
                 <h3>No Applications Yet</h3>
-
                 <p>
                     Applications from lawyers who want to join
                     your firm will appear here.
@@ -439,116 +443,24 @@ function renderFirmApplications() {
             application.lawyerName || "Unnamed Lawyer"
         );
 
-        const practiceArea = escapeApplicationHTML(
-            application.practiceArea || "Not specified"
-        );
+        const status = application.status || "pending";
 
-        const status = escapeApplicationHTML(
-            application.status || "pending"
-        );
-
-        const qualifications = escapeApplicationHTML(
-            application.qualifications || "Not provided"
-        );
-
-        const experience = escapeApplicationHTML(
-            application.experience || "Not provided"
-        );
-
-        const coverLetter = escapeApplicationHTML(
-            application.coverLetter || "No cover letter provided."
-        );
-
-        const date = application.submittedAt?.toDate
-            ? application.submittedAt.toDate().toLocaleDateString()
-            : "Date unavailable";
+        const safeStatus = escapeApplicationHTML(status);
 
         return `
-            <div class="dashboard-panel application-card">
+            <div class="dashboard-panel application-list-item">
 
-                <div class="application-header">
+                <button
+                    type="button"
+                    class="applicant-name-button"
+                    data-application-id="${escapeApplicationHTML(application.id)}"
+                >
+                    ${lawyerName}
+                </button>
 
-                    <div>
-                        <h3>${lawyerName}</h3>
-
-                        <p>
-                            Practice Area: ${practiceArea}
-                        </p>
-
-                        <p>
-                            Submitted: ${date}
-                        </p>
-                    </div>
-
-                    <span class="application-status">
-                        ${status.toUpperCase()}
-                    </span>
-
-                </div>
-
-                <div class="application-details">
-
-                    <h4>Qualifications</h4>
-                    <p>${qualifications}</p>
-
-                    <h4>Professional Experience</h4>
-                    <p>${experience}</p>
-
-                    <h4>Cover Letter</h4>
-                    <p>${coverLetter}</p>
-
-                </div>
-
-                <div class="application-documents">
-
-                    <h4>Supporting Documents</h4>
-
-                    ${
-                        Array.isArray(application.documents) &&
-                        application.documents.length > 0
-                            ? application.documents.map(document => `
-                                <p>
-                                    ${escapeApplicationHTML(
-                                        document.fileName || document.name || "Uploaded document"
-                                    )}
-                                    <span>
-                                        (${escapeApplicationHTML(
-                                            document.type || document.documentType || "Document"
-                                        )})
-                                    </span>
-                                </p>
-                            `).join("")
-                            : "<p>No document information available.</p>"
-                    }
-
-                </div>
-                <div class="application-actions">
-
-                ${
-                    application.status === "pending"
-                    ? `
-                        <button
-                            class="accept-application-button"
-                            data-application-id="${application.id}"
-                        >
-                            Accept Application
-                        </button>
-
-                        <button
-                            class="decline-application-button"
-                            data-application-id="${application.id}"
-                        >
-                            Decline Application
-                        </button>
-                    `
-                    : `
-                        <p class="application-decision-message">
-                            This application has already been reviewed.
-                        </p>
-                    `
-                }
-
-            </div>
+                <span class="application-status status-${safeStatus}">
+                    ${safeStatus.toUpperCase()}
+                </span>
 
             </div>
         `;
@@ -556,6 +468,509 @@ function renderFirmApplications() {
     }).join("");
 
 }
+
+/* =========================================
+   APPLICATION DETAILS MODAL
+========================================= */
+
+function createApplicationModal() {
+
+    // Avoid creating the modal more than once.
+    if (document.getElementById("applicationDetailsModal")) {
+        return;
+    }
+
+    const modalStyles = document.createElement("style");
+
+    modalStyles.textContent = `
+
+        .application-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+        }
+
+        .applicant-name-button {
+            background: none;
+            border: none;
+            padding: 0;
+            color: #0B2D52;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .applicant-name-button:hover {
+            color: #D9A928;
+            text-decoration: underline;
+        }
+
+        .application-status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-accepted {
+            background: #D1FADF;
+            color: #027A48;
+        }
+
+        .status-declined {
+            background: #FEE4E2;
+            color: #B42318;
+        }
+
+        .status-withdrawn {
+            background: #EAECF0;
+            color: #475467;
+        }
+
+        .application-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 31, 54, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .application-modal-overlay.active {
+            display: flex;
+        }
+
+        .application-modal {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 14px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .application-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 22px 25px;
+            background: #0B2D52;
+            color: #FFFFFF;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .application-modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .application-modal-close {
+            background: transparent;
+            border: none;
+            color: #FFFFFF;
+            font-size: 27px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .application-modal-body {
+            padding: 25px;
+        }
+
+        .application-modal-body h3 {
+            color: #0B2D52;
+            margin: 0 0 8px;
+        }
+
+        .application-modal-body h4 {
+            color: #0B2D52;
+            margin: 22px 0 7px;
+        }
+
+        .application-modal-body p {
+            color: #66788A;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .application-modal-section {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #DCE3EA;
+        }
+
+        .application-modal-documents {
+            background: #F5F7FA;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .application-modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .application-modal-actions button {
+            padding: 12px 20px;
+            border-radius: 7px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-accept-button {
+            background: #0B2D52;
+            color: white;
+        }
+
+        .modal-decline-button {
+            background: #FFFFFF;
+            color: #B42318;
+            border: 1px solid #B42318 !important;
+        }
+
+        .modal-close-button {
+            background: #EAECF0;
+            color: #344054;
+            margin-left: auto;
+        }
+
+        @media (max-width: 600px) {
+
+            .application-modal-overlay {
+                padding: 10px;
+            }
+
+            .application-modal-body {
+                padding: 18px;
+            }
+
+            .application-modal-header {
+                padding: 18px;
+            }
+
+            .application-modal-actions {
+                flex-direction: column;
+            }
+
+            .application-modal-actions button {
+                width: 100%;
+            }
+
+            .modal-close-button {
+                margin-left: 0;
+            }
+
+        }
+
+    `;
+
+    document.head.appendChild(modalStyles);
+
+    const modal = document.createElement("div");
+
+    modal.id = "applicationDetailsModal";
+    modal.className = "application-modal-overlay";
+
+    modal.innerHTML = `
+        <div class="application-modal">
+
+            <div class="application-modal-header">
+
+                <h2>Lawyer Application Details</h2>
+
+                <button
+                    type="button"
+                    class="application-modal-close"
+                    id="closeApplicationModal"
+                    aria-label="Close application details"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <div
+                class="application-modal-body"
+                id="applicationModalContent"
+            ></div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close button
+    document.getElementById("closeApplicationModal")
+        .addEventListener("click", closeApplicationModal);
+
+    // Close when clicking outside the modal
+    modal.addEventListener("click", event => {
+
+        if (event.target === modal) {
+            closeApplicationModal();
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   OPEN APPLICATION DETAILS
+========================================= */
+
+function openApplicationDetails(applicationId) {
+
+    const application = firmApplications.find(
+        item => item.id === applicationId
+    );
+
+    if (!application) {
+        showToast("Application could not be found.");
+        return;
+    }
+
+    createApplicationModal();
+
+    const modal = document.getElementById(
+        "applicationDetailsModal"
+    );
+
+    const modalContent = document.getElementById(
+        "applicationModalContent"
+    );
+
+    const lawyerName = escapeApplicationHTML(
+        application.lawyerName || "Unnamed Lawyer"
+    );
+
+    const practiceArea = escapeApplicationHTML(
+        application.practiceArea || "Not specified"
+    );
+
+    const barNumber = escapeApplicationHTML(
+        application.barAdmissionNumber || "Not provided"
+    );
+
+    const qualifications = escapeApplicationHTML(
+        application.qualifications || "Not provided"
+    );
+
+    const experience = escapeApplicationHTML(
+        application.experience || "Not provided"
+    );
+
+    const coverLetter = escapeApplicationHTML(
+        application.coverLetter || "No cover letter provided."
+    );
+
+    const status = escapeApplicationHTML(
+        application.status || "pending"
+    );
+
+    const date = application.submittedAt?.toDate
+        ? application.submittedAt.toDate().toLocaleDateString()
+        : "Date unavailable";
+
+    const documents = Array.isArray(application.documents)
+        ? application.documents
+        : [];
+
+    const documentsHTML = documents.length > 0
+        ? documents.map(document => `
+
+            <p>
+                <strong>
+                    ${escapeApplicationHTML(
+                        document.fileName ||
+                        document.name ||
+                        "Uploaded document"
+                    )}
+                </strong>
+
+                <span>
+                    (${escapeApplicationHTML(
+                        document.type ||
+                        document.documentType ||
+                        "Document"
+                    )})
+                </span>
+            </p>
+
+        `).join("")
+        : "<p>No supporting documents available.</p>";
+
+    const actionButtons = application.status === "pending"
+        ? `
+            <div class="application-modal-actions">
+
+                <button
+                    type="button"
+                    class="modal-accept-button"
+                    data-application-id="${escapeApplicationHTML(application.id)}"
+                >
+                    Accept Application
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-decline-button"
+                    data-application-id="${escapeApplicationHTML(application.id)}"
+                >
+                    Decline Application
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-close-button"
+                    id="modalBottomCloseButton"
+                >
+                    Close
+                </button>
+
+            </div>
+        `
+        : `
+            <div class="application-modal-actions">
+
+                <p>
+                    This application has already been reviewed.
+                </p>
+
+                <button
+                    type="button"
+                    class="modal-close-button"
+                    id="modalBottomCloseButton"
+                >
+                    Close
+                </button>
+
+            </div>
+        `;
+
+    modalContent.innerHTML = `
+
+        <div class="application-modal-section">
+
+            <h3>${lawyerName}</h3>
+
+            <span class="application-status status-${status}">
+                ${status.toUpperCase()}
+            </span>
+
+            <p>
+                <strong>Submitted:</strong> ${date}
+            </p>
+
+        </div>
+
+        <div class="application-modal-section">
+
+            <h4>Practice Area</h4>
+            <p>${practiceArea}</p>
+
+            <h4>Bar Admission Number</h4>
+            <p>${barNumber}</p>
+
+        </div>
+
+        <div class="application-modal-section">
+
+            <h4>Qualifications</h4>
+            <p>${qualifications}</p>
+
+            <h4>Professional Experience</h4>
+            <p>${experience}</p>
+
+        </div>
+
+        <div class="application-modal-section">
+
+            <h4>Cover Letter</h4>
+            <p>${coverLetter}</p>
+
+        </div>
+
+        <div class="application-modal-documents">
+
+            <h4>Supporting Documents</h4>
+
+            ${documentsHTML}
+
+        </div>
+
+        ${actionButtons}
+
+    `;
+
+    // Bottom close button
+    document.getElementById("modalBottomCloseButton")
+        ?.addEventListener("click", closeApplicationModal);
+
+    // Accept application
+    modalContent.querySelector(".modal-accept-button")
+        ?.addEventListener("click", async event => {
+
+            const id = event.currentTarget.dataset.applicationId;
+
+            await reviewFirmApplication(id, "accepted");
+
+        });
+
+    // Decline application
+    modalContent.querySelector(".modal-decline-button")
+        ?.addEventListener("click", async event => {
+
+            const id = event.currentTarget.dataset.applicationId;
+
+            await reviewFirmApplication(id, "declined");
+
+        });
+
+    modal.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+
+}
+
+
+/* =========================================
+   CLOSE APPLICATION DETAILS
+========================================= */
+
+function closeApplicationModal() {
+
+    const modal = document.getElementById(
+        "applicationDetailsModal"
+    );
+
+    if (modal) {
+        modal.classList.remove("active");
+    }
+
+    document.body.style.overflow = "";
+
+}
+
 
 
 /* =========================================
@@ -1197,12 +1612,16 @@ async function reviewFirmApplication(applicationId, decision) {
 
         await batch.commit();
 
+        // Close the application details modal
+        closeApplicationModal();
+
         showToast(
             decision === "accepted"
                 ? "Lawyer successfully accepted!"
                 : "Application declined successfully."
         );
 
+        // Refresh the applications list
         await loadFirmApplications();
 
     } catch (error) {
@@ -1225,35 +1644,26 @@ async function reviewFirmApplication(applicationId, decision) {
    APPLICATION ACTION EVENTS
 ========================================= */
 
+
+/* =========================================
+   APPLICATION LIST EVENTS
+========================================= */
+
 firmApplicationsList?.addEventListener("click", event => {
 
-    const acceptButton = event.target.closest(
-        ".accept-application-button"
+    const applicantButton = event.target.closest(
+        ".applicant-name-button"
     );
 
-    const declineButton = event.target.closest(
-        ".decline-application-button"
-    );
+    if (!applicantButton) return;
 
-    if (acceptButton) {
+    const applicationId =
+        applicantButton.dataset.applicationId;
 
-        reviewFirmApplication(
-            acceptButton.dataset.applicationId,
-            "accepted"
-        );
-
-    }
-
-    if (declineButton) {
-
-        reviewFirmApplication(
-            declineButton.dataset.applicationId,
-            "declined"
-        );
-
-    }
+    openApplicationDetails(applicationId);
 
 });
+
 /* =========================================
    INITIAL DASHBOARD STATE
 ========================================= */
