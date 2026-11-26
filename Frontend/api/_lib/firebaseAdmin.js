@@ -1,32 +1,64 @@
 
-const admin = require("firebase-admin");
+const { initializeApp, getApps, cert } = require("firebase-admin/app");
+
+const { getAuth } = require("firebase-admin/auth");
+
+const {
+    getFirestore,
+    FieldValue,
+    Timestamp
+} = require("firebase-admin/firestore");
+
+// ========================================
+// VALIDATE FIREBASE CONFIGURATION
+// ========================================
+
+if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    throw new Error(
+        "FIREBASE_SERVICE_ACCOUNT_JSON environment variable is missing."
+    );
+}
+
+let serviceAccount;
+
+try {
+    serviceAccount = JSON.parse(
+        process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+    );
+} catch (error) {
+    console.error("Firebase service account JSON is invalid:", error.message);
+    throw new Error("Firebase Admin configuration is invalid.");
+}
 
 // ========================================
 // INITIALIZE FIREBASE ADMIN
 // ========================================
 
-if (!admin.apps.length) {
-    try {
-        const serviceAccount = JSON.parse(
-            process.env.FIREBASE_SERVICE_ACCOUNT_JSON
-        );
+const app = getApps().length
+    ? getApps()[0]
+    : initializeApp({
+        credential: cert(serviceAccount)
+    });
 
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
+// ========================================
+// FIREBASE SERVICES
+// ========================================
 
-    } catch (error) {
-        console.error("Firebase Admin initialization failed:", error.message);
-        throw new Error("Server authentication configuration is invalid.");
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Compatibility helper for existing API files
+const firestore = Object.assign(
+    () => db,
+    {
+        FieldValue,
+        Timestamp
     }
-}
+);
 
-// ========================================
-// EXPORT FIREBASE SERVICES
-// ========================================
-
-const db = admin.firestore();
-const auth = admin.auth();
+const admin = {
+    firestore
+};
 
 module.exports = {
     admin,
