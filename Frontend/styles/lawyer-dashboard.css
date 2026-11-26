@@ -1,10 +1,13 @@
 
 /* =========================================
    HAKILINK - LAWYER DASHBOARD
-   Main stylesheet
+   Complete Responsive Stylesheet
 ========================================= */
 
-/* 1. ROOT VARIABLES */
+/* =========================================
+   1. ROOT VARIABLES
+========================================= */
+
 :root {
     --navy: #0B2D52;
     --navy-dark: #061F36;
@@ -25,9 +28,17 @@
     --shadow: 0 5px 20px rgba(11, 45, 82, 0.05);
 }
 
-/* 2. GLOBAL STYLES */
+
+/* =========================================
+   2. GLOBAL STYLES
+========================================= */
+
 * {
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -61,7 +72,15 @@ textarea:focus-visible {
     display: none !important;
 }
 
-/* 3. MAIN LAYOUT */
+img {
+    max-width: 100%;
+}
+
+
+/* =========================================
+   3. MAIN LAYOUT
+========================================= */
+
 .app-layout {
     min-height: 100vh;
 }
@@ -69,6 +88,7 @@ textarea:focus-visible {
 .main-area {
     min-height: 100vh;
     margin-left: 252px;
+    min-width: 0;
 }
 
 .page-content {
@@ -86,12 +106,18 @@ textarea:focus-visible {
     display: block;
 }
 
-/* 4. SIDEBAR */
+
+/* =========================================
+   4. SIDEBAR
+========================================= */
+
 .sidebar {
     width: 252px;
+
     position: fixed;
     inset: 0 auto 0 0;
-    z-index: 20;
+
+    z-index: 200;
 
     display: flex;
     flex-direction: column;
@@ -102,6 +128,7 @@ textarea:focus-visible {
     color: #FFFFFF;
 
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .brand {
@@ -132,6 +159,12 @@ textarea:focus-visible {
     font-size: 24px;
 }
 
+.logo-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
 .gold-text {
     color: var(--gold-light);
 }
@@ -155,7 +188,9 @@ textarea:focus-visible {
     gap: 6px;
 }
 
-/* Sidebar navigation typography fix */
+
+/* Sidebar navigation */
+
 .sidebar .nav-link {
     width: 100%;
     min-height: 43px;
@@ -226,6 +261,9 @@ textarea:focus-visible {
     object-fit: contain;
 }
 
+
+/* Sidebar bottom */
+
 .sidebar-bottom {
     margin-top: auto;
 }
@@ -286,7 +324,11 @@ textarea:focus-visible {
     margin-right: 10px;
 }
 
-/* 5. TOPBAR */
+
+/* =========================================
+   5. TOPBAR
+========================================= */
+
 .topbar {
     min-height: 83px;
 
@@ -298,6 +340,10 @@ textarea:focus-visible {
 
     border-bottom: 1px solid var(--border);
     background: var(--surface);
+}
+
+.topbar-heading {
+    min-width: 0;
 }
 
 .topbar-eyebrow {
@@ -349,15 +395,41 @@ textarea:focus-visible {
     font-size: 12px;
 }
 
+
+/* Hamburger button */
+
 .menu-button {
     display: none;
-    border: 0;
-    background: transparent;
+    flex-shrink: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    background: #FFFFFF;
     color: var(--navy);
+
     font-size: 24px;
+    line-height: 1;
 }
 
-/* 6. WELCOME PANEL */
+.menu-button:hover {
+    background: #F5F7FA;
+    border-color: var(--gold);
+}
+
+
+/* =========================================
+   6. WELCOME PANEL
+========================================= */
+
 .welcome-panel {
     display: flex;
     align-items: center;
@@ -367,7 +439,12 @@ textarea:focus-visible {
     padding: 32px;
 
     border-radius: 16px;
-    background: linear-gradient(120deg, var(--navy-dark), var(--navy-light));
+    background: linear-gradient(
+        120deg,
+        var(--navy-dark),
+        var(--navy-light)
+    );
+
     color: #FFFFFF;
 }
 
@@ -407,7 +484,11 @@ textarea:focus-visible {
     font-size: 53px;
 }
 
-/* 7. STATISTICS */
+
+/* =========================================
+   7. STATISTICS
+========================================= */
+
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -445,12 +526,6 @@ textarea:focus-visible {
     object-fit: contain;
 }
 
-.logo-icon img {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-}
-
 .gold-bg {
     background: #FFF4CF;
     color: #856404;
@@ -484,7 +559,11 @@ textarea:focus-visible {
     font-size: 12px;
 }
 
-/* 8. CONTENT CARDS */
+
+/* =========================================
+   8. CONTENT CARDS
+========================================= */
+
 .content-card {
     min-width: 0;
     margin-bottom: 22px;
@@ -523,7 +602,11 @@ textarea:focus-visible {
     color: #986F00;
 }
 
-/* 9. SECTION HEADINGS */
+
+/* =========================================
+   9. SECTION HEADINGS
+========================================= */
+
 .section-intro {
     margin-bottom: 23px;
 }
@@ -561,7 +644,11 @@ textarea:focus-visible {
     line-height: 1.6;
 }
 
-/* 10. TOOLBARS AND SEARCH */
+
+/* =========================================
+   10. TOOLBARS AND SEARCH
+========================================= */
+
 .toolbar {
     display: flex;
     gap: 12px;
@@ -598,7 +685,11 @@ textarea:focus-visible {
     border-color: var(--gold);
 }
 
-/* 11. DATA LISTS */
+
+/* =========================================
+   11. DATA LISTS
+========================================= */
+
 .data-list {
     display: grid;
     gap: 12px;
@@ -731,7 +822,11 @@ textarea:focus-visible {
     line-height: 1.7;
 }
 
-/* 12. PAGE MESSAGES */
+
+/* =========================================
+   12. PAGE MESSAGES
+========================================= */
+
 .page-message {
     margin-bottom: 20px;
     padding: 13px 15px;
@@ -761,7 +856,11 @@ textarea:focus-visible {
     color: #184E77;
 }
 
-/* 13. PROFESSIONAL PROFILE */
+
+/* =========================================
+   13. PROFESSIONAL PROFILE
+========================================= */
+
 .profile-layout {
     display: grid;
     grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.8fr);
@@ -865,7 +964,11 @@ button:disabled {
     opacity: 0.65;
 }
 
-/* 14. MESSAGING */
+
+/* =========================================
+   14. MESSAGING
+========================================= */
+
 .messages-layout {
     display: grid;
     grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1.6fr);
@@ -1098,7 +1201,11 @@ button:disabled {
     background: var(--navy-light);
 }
 
-/* 15. LAWYER FEEDBACK */
+
+/* =========================================
+   15. LAWYER FEEDBACK
+========================================= */
+
 .feedback-group {
     display: flex;
     flex-direction: column;
@@ -1170,7 +1277,11 @@ button:disabled {
     overflow-wrap: anywhere;
 }
 
-/* 16. NOTIFICATIONS */
+
+/* =========================================
+   16. NOTIFICATIONS
+========================================= */
+
 .topbar-actions {
     display: flex;
     align-items: center;
@@ -1351,7 +1462,11 @@ button:disabled {
     font-size: 13px;
 }
 
-/* 17. LAW FIRM DIRECTORY */
+
+/* =========================================
+   17. LAW FIRM DIRECTORY
+========================================= */
+
 #find-firms,
 #my-applications {
     padding: 25px;
@@ -1395,7 +1510,9 @@ button:disabled {
     align-items: start;
 }
 
+
 /* Firm and application cards */
+
 #firmsList .data-item,
 #applicationsList .data-item {
     display: flex;
@@ -1450,7 +1567,11 @@ button:disabled {
     overflow-wrap: anywhere;
 }
 
-/* 18. APPLICATION FORM */
+
+/* =========================================
+   18. APPLICATION FORM
+========================================= */
+
 .firm-application-form {
     display: block;
     width: 100%;
@@ -1528,7 +1649,9 @@ button:disabled {
     color: #98A2B3;
 }
 
+
 /* Application form buttons */
+
 .firm-application-form .item-actions {
     display: flex;
     align-items: center;
@@ -1573,7 +1696,9 @@ button:disabled {
     color: var(--navy);
 }
 
+
 /* Application status */
+
 #applicationsList .status-pill {
     display: inline-flex;
     align-items: center;
@@ -1607,7 +1732,9 @@ button:disabled {
     color: #596579;
 }
 
+
 /* Firm decision notes */
+
 #applicationsList .saved-feedback {
     width: 100%;
     padding: 12px;
@@ -1629,7 +1756,9 @@ button:disabled {
     font-size: 13px;
 }
 
+
 /* Application buttons */
+
 #firmsList .small-button,
 #applicationsList .small-button {
     padding: 10px 16px;
@@ -1669,7 +1798,9 @@ button:disabled {
     cursor: not-allowed;
 }
 
+
 /* Empty directory and application states */
+
 #firmsList .empty-state,
 #applicationsList .empty-state {
     grid-column: 1 / -1;
@@ -1684,7 +1815,11 @@ button:disabled {
     border-radius: 10px;
 }
 
-/* 19. FOOTER */
+
+/* =========================================
+   19. FOOTER
+========================================= */
+
 .page-footer {
     display: flex;
     justify-content: space-between;
@@ -1699,12 +1834,69 @@ button:disabled {
     font-size: 12px;
 }
 
+
 /* =========================================
-   20. RESPONSIVE DESIGN
+   20. APPLICATION DOCUMENT UPLOADS
 ========================================= */
 
+.uploaded-document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.uploaded-document-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+
+.uploaded-document-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.uploaded-document-details strong {
+    overflow-wrap: anywhere;
+}
+
+.uploaded-document-details small {
+    color: var(--text-medium);
+    text-transform: capitalize;
+}
+
+.uploaded-document-item button {
+    flex-shrink: 0;
+}
+
+.firm-application-form input[type="file"] {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+
+
+/* =========================================
+   21. RESPONSIVE DESIGN
+========================================= */
+
+
 /* Tablets and smaller laptops */
+
 @media (max-width: 1100px) {
+
     .sidebar {
         width: 225px;
     }
@@ -1724,50 +1916,181 @@ button:disabled {
     .stat-card {
         padding: 17px;
     }
+
 }
 
-/* Mobile navigation and layout */
-@media (max-width: 800px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
 
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.12);
+/* =========================================
+   MOBILE SIDEBAR AND NAVIGATION
+========================================= */
+
+@media (max-width: 800px) {
+
+    .app-layout {
+        display: block;
+        min-height: 100vh;
+    }
+
+    .main-area {
+        width: 100%;
+        min-width: 0;
+        min-height: 100vh;
+        margin-left: 0;
+    }
+
+    /* Mobile sidebar */
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        width: 252px;
+        height: 100vh;
+        min-height: 100vh;
+
+        padding: 25px 18px 18px;
+
+        z-index: 2000;
+
+        overflow-y: auto;
+        overscroll-behavior: contain;
+
+        transform: translateX(-105%);
+        visibility: hidden;
+
+        transition:
+            transform 0.3s ease,
+            visibility 0.3s ease;
+
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
     }
 
     .sidebar.open {
         transform: translateX(0);
+        visibility: visible;
     }
 
-    .main-area {
-        margin-left: 0;
+    /* Navigation */
+
+    .navigation {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
+
+    .sidebar .nav-link {
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    /* Hamburger */
 
     .menu-button {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+
+        padding: 0;
+
+        border: 1px solid var(--border);
+        border-radius: 9px;
+
+        background: #FFFFFF;
+        color: var(--navy);
+
+        font-size: 23px;
+        line-height: 1;
+
+        cursor: pointer;
     }
+
+    .menu-button:hover {
+        background: #F5F7FA;
+        border-color: var(--gold);
+    }
+
+    /* Topbar */
 
     .topbar {
-        padding: 15px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+
+        min-height: 75px;
+        padding: 13px 20px;
+        gap: 12px;
+
+        background: #FFFFFF;
     }
 
+    .topbar-heading {
+        min-width: 0;
+    }
+
+    .topbar h2 {
+        font-size: 19px;
+    }
+
+    /* Page content */
+
     .page-content {
+        width: 100%;
         padding: 20px;
     }
 
     .profile-layout {
         grid-template-columns: 1fr;
     }
+
 }
 
-/* Phones */
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
 @media (max-width: 600px) {
+
+    .topbar {
+        padding: 12px 14px;
+        gap: 9px;
+    }
+
     .topbar-user-info {
         display: none;
     }
 
     .topbar-actions {
         gap: 10px;
+    }
+
+    .topbar h2 {
+        font-size: 17px;
+    }
+
+    .topbar-eyebrow {
+        font-size: 9px;
+    }
+
+    .notification-button {
+        width: 39px;
+        height: 39px;
+    }
+
+    .notification-dropdown {
+        right: -45px;
+        width: 330px;
+        max-width: calc(100vw - 20px);
+    }
+
+    .page-content {
+        padding: 15px;
     }
 
     .welcome-panel {
@@ -1779,6 +2102,8 @@ button:disabled {
         height: 55px;
         font-size: 30px;
     }
+
+    /* Statistics */
 
     .stat-grid {
         grid-template-columns: 1fr;
@@ -1806,6 +2131,8 @@ button:disabled {
         font-size: 25px;
     }
 
+    /* Search */
+
     .toolbar {
         flex-direction: column;
     }
@@ -1818,6 +2145,8 @@ button:disabled {
         padding: 17px;
     }
 
+    /* Profile */
+
     .profile-form {
         grid-template-columns: 1fr;
     }
@@ -1825,6 +2154,8 @@ button:disabled {
     .profile-form .full-width {
         grid-column: auto;
     }
+
+    /* Messages */
 
     .messages-layout {
         grid-template-columns: 1fr;
@@ -1862,9 +2193,13 @@ button:disabled {
         font-size: 12px;
     }
 
+    /* Footer */
+
     .page-footer {
         flex-direction: column;
     }
+
+    /* Law firm directory */
 
     #find-firms,
     #my-applications {
@@ -1893,58 +2228,45 @@ button:disabled {
         width: 100%;
     }
 
-    .notification-dropdown {
-        right: -55px;
+}
+
+
+/* =========================================
+   22. DESKTOP SIDEBAR
+========================================= */
+
+@media (min-width: 801px) {
+
+    .sidebar {
+        width: 252px;
+        transform: translateX(0);
+        visibility: visible;
     }
-}
-/* ============================================
-   APPLICATION DOCUMENT UPLOADS
-============================================ */
 
-.uploaded-document-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 12px 0;
-}
+    .main-area {
+        margin-left: 252px;
+    }
 
-.uploaded-document-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid var(--border, #DCE3EA);
-    border-radius: 8px;
-    background: #fff;
+    .menu-button {
+        display: none;
+    }
+
 }
 
-.uploaded-document-details {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-width: 0;
-}
 
-.uploaded-document-details strong {
-    overflow-wrap: anywhere;
-}
+/* =========================================
+   23. REDUCED MOTION ACCESSIBILITY
+========================================= */
 
-.uploaded-document-details small {
-    color: var(--text-medium, #66788A);
-    text-transform: capitalize;
-}
+@media (prefers-reduced-motion: reduce) {
 
-.uploaded-document-item button {
-    flex-shrink: 0;
-}
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 
-.firm-application-form input[type="file"] {
-    display: block;
-    width: 100%;
-    margin-top: 8px;
-    padding: 10px;
-    border: 1px dashed var(--border, #DCE3EA);
-    border-radius: 8px;
-    background: #fff;
 }
