@@ -527,3 +527,178 @@ button {
         padding: 0 13px;
     }
 }
+
+/* =========================================
+   LAWYER APPLICATIONS SECTION
+========================================= */
+
+#applications .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+#applications .section-heading button,
+#refreshApplicationsButton {
+    background: #0B2D52;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+#applications .section-heading button:hover,
+#refreshApplicationsButton:hover {
+    background: #061F36;
+}
+
+#applications .stats-grid {
+    margin-bottom: 25px;
+}
+
+.application-card {
+    background: #FFFFFF;
+    border: 1px solid #DCE3EA;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.application-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #DCE3EA;
+}
+
+.application-header h3 {
+    color: #0B2D52;
+    font-size: 19px;
+    margin: 0 0 10px;
+}
+
+.application-header p {
+    color: #66788A;
+    font-size: 13px;
+    margin: 6px 0;
+}
+
+.application-status {
+    display: inline-block;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: #FFF4D6;
+    color: #8A6200;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.application-details {
+    padding: 20px 0;
+}
+
+.application-details h4,
+.application-documents h4 {
+    color: #0B2D52;
+    font-size: 14px;
+    margin: 17px 0 8px;
+}
+
+.application-details p,
+.application-documents p {
+    color: #66788A;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.application-documents {
+    padding-top: 15px;
+    border-top: 1px solid #DCE3EA;
+}
+
+.application-documents p {
+    padding: 10px 0;
+    border-bottom: 1px solid #F0F2F5;
+}
+
+.application-documents span {
+    color: #8995A3;
+    font-size: 12px;
+}
+
+/* Empty application state */
+
+#firmApplicationsList .dashboard-panel {
+    background: #FFFFFF;
+    padding: 30px;
+    border: 1px solid #DCE3EA;
+    border-radius: 12px;
+}
+
+#firmApplicationsList .dashboard-panel h3 {
+    color: #0B2D52;
+    margin-bottom: 10px;
+}
+
+#firmApplicationsList .dashboard-panel p {
+    color: #66788A;
+    line-height: 1.6;
+}
+
+/* Application count in sidebar */
+
+#applicationCount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 5px;
+    margin-left: 8px;
+    border-radius: 50px;
+    background: #D9A928;
+    color: #061F36;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 768px) {
+
+    #applications .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #refreshApplicationsButton {
+        width: 100%;
+    }
+
+    .application-card {
+        padding: 18px;
+    }
+
+    .application-header {
+        flex-direction: column;
+    }
+
+    .application-status {
+        align-self: flex-start;
+    }
+
+}

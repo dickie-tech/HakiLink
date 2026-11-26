@@ -47,6 +47,11 @@
             <span id="requestCount">0</span>
           </button>
 
+          <button class="nav-link" data-section="applications">
+            Lawyer Applications
+            <span id="applicationCount">0</span>
+          </button>
+
           <button class="nav-link" data-section="appointments">
             Appointments
           </button>
@@ -164,6 +169,42 @@
           </div>
 
           <div id="firmRequestsList"></div>
+        </section>
+        <!-- LAWYER APPLICATIONS -->
+        <section id="applications" class="dashboard-section">
+
+          <div class="section-heading">
+            <div>
+              <h2>Lawyer Applications</h2>
+              <p>Review applications from lawyers seeking to join your firm.</p>
+            </div>
+
+            <button id="refreshApplicationsButton">
+              Refresh Applications
+            </button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Total Applications</h3>
+              <strong id="totalApplications">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <h3>Pending Review</h3>
+              <strong id="pendingApplications">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <h3>Accepted</h3>
+              <strong id="acceptedApplications">0</strong>
+            </div>
+          </div>
+
+          <div id="firmApplicationsList">
+            <p>Loading applications...</p>
+          </div>
+
         </section>
 
         <!-- APPOINTMENTS -->
