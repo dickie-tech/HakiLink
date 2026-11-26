@@ -24,32 +24,31 @@ import {
 ========================================= */
 
 const navLinks = document.querySelectorAll(".nav-link");
+const dashboardSections = document.querySelectorAll(".dashboard-section");
 
-const dashboardSections =
-    document.querySelectorAll(".dashboard-section");
+const welcomeHeading = document.getElementById("welcomeHeading");
+const addLawyerButton = document.getElementById("addLawyerButton");
 
-const welcomeHeading =
-    document.getElementById("welcomeHeading");
+const sidebarFirmName = document.getElementById("sidebarFirmName");
+const topbarFirmName = document.getElementById("topbarFirmName");
+const firmAvatar = document.getElementById("firmAvatar");
 
-const addLawyerButton =
-    document.getElementById("addLawyerButton");
+const logoutButton = document.getElementById("logoutButton");
+const firmProfileContent = document.getElementById("firmProfileContent");
 
-const sidebarFirmName =
-    document.getElementById("sidebarFirmName");
-
-const topbarFirmName =
-    document.getElementById("topbarFirmName");
-
-const firmAvatar =
-    document.getElementById("firmAvatar");
-
-const logoutButton =
-    document.getElementById("logoutButton");
-
-const firmProfileContent =
-    document.getElementById("firmProfileContent");
 const menuButton = document.getElementById("menuButton");
 const sidebar = document.getElementById("sidebar");
+
+const firmApplicationsList = document.getElementById("firmApplicationsList");
+const applicationCount = document.getElementById("applicationCount");
+const totalApplications = document.getElementById("totalApplications");
+const pendingApplications = document.getElementById("pendingApplications");
+const acceptedApplications = document.getElementById("acceptedApplications");
+
+const refreshApplicationsButton = document.getElementById(
+    "refreshApplicationsButton"
+);
+
 
 /* =========================================
    GLOBAL STATE
@@ -58,33 +57,15 @@ const sidebar = document.getElementById("sidebar");
 let currentUser = null;
 let currentFirmData = null;
 let firmApplications = [];
+let isReviewingApplication = false;
 
-const firmApplicationsList =
-    document.getElementById("firmApplicationsList");
-
-const applicationCount =
-    document.getElementById("applicationCount");
-
-const totalApplications =
-    document.getElementById("totalApplications");
-
-const pendingApplications =
-    document.getElementById("pendingApplications");
-
-const acceptedApplications =
-    document.getElementById("acceptedApplications");
-
-const refreshApplicationsButton =
-    document.getElementById("refreshApplicationsButton");
 
 /* =========================================
    DASHBOARD NAVIGATION
 ========================================= */
 
 function openSection(sectionId) {
-
-    const targetSection =
-        document.getElementById(sectionId);
+    const targetSection = document.getElementById(sectionId);
 
     if (
         !targetSection ||
@@ -113,12 +94,10 @@ function openSection(sectionId) {
         activeLink.setAttribute("aria-current", "page");
     }
 
-    const sectionHeading =
-        targetSection.querySelector("h2");
+    const sectionHeading = targetSection.querySelector("h2");
 
     if (welcomeHeading && sectionHeading) {
-        welcomeHeading.textContent =
-            sectionHeading.textContent;
+        welcomeHeading.textContent = sectionHeading.textContent;
     }
 
     window.scrollTo({
@@ -129,89 +108,59 @@ function openSection(sectionId) {
 
 
 /* =========================================
-   NAVIGATION EVENTS
-========================================= */
-
-navLinks.forEach(link => {
-
-    link.addEventListener("click", () => {
-
-        openSection(link.dataset.section);
-
-    });
-
-});
-
-/* =========================================
-   MOBILE SIDEBAR MENU
+   MOBILE SIDEBAR
 ========================================= */
 
 function closeSidebar() {
-
-    if (!sidebar || !menuButton) return;
-
-    sidebar.classList.remove("open");
-
-    menuButton.setAttribute("aria-expanded", "false");
-
+    sidebar?.classList.remove("open");
+    menuButton?.setAttribute("aria-expanded", "false");
 }
 
 function toggleSidebar() {
-
     if (!sidebar || !menuButton) return;
 
     const isOpen = sidebar.classList.toggle("open");
 
-    menuButton.setAttribute(
-        "aria-expanded",
-        String(isOpen)
-    );
-
+    menuButton.setAttribute("aria-expanded", String(isOpen));
 }
 
-// Toggle hamburger menu
 menuButton?.addEventListener("click", event => {
-
     event.stopPropagation();
-
     toggleSidebar();
-
 });
 
-// Close when clicking outside the sidebar
-document.addEventListener("click", event => {
+// One navigation listener per link.
+navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+        openSection(link.dataset.section);
+        closeSidebar();
+    });
+});
 
+// Close sidebar when clicking outside it.
+document.addEventListener("click", event => {
     if (!sidebar || !menuButton) return;
 
     const clickedOutside =
         !sidebar.contains(event.target) &&
         !menuButton.contains(event.target);
 
-    if (
-        sidebar.classList.contains("open") &&
-        clickedOutside
-    ) {
+    if (sidebar.classList.contains("open") && clickedOutside) {
         closeSidebar();
     }
-
 });
 
-// Close after selecting a navigation item
-navLinks.forEach(link => {
 
-    link.addEventListener("click", closeSidebar);
+/* =========================================
+   KEYBOARD CONTROLS
+========================================= */
 
-});
-
-// Close when pressing Escape
 document.addEventListener("keydown", event => {
-
     if (event.key === "Escape") {
         closeSidebar();
+        closeApplicationModal();
     }
-
 });
-
 
 
 /* =========================================
@@ -219,69 +168,46 @@ document.addEventListener("keydown", event => {
 ========================================= */
 
 async function loadFirmProfile(user) {
-
     try {
-
         const firmRef = doc(db, "users", user.uid);
-
         const firmSnapshot = await getDoc(firmRef);
 
         if (!firmSnapshot.exists()) {
-
-            showToast(
-                "Your law firm account could not be found."
-            );
-
+            showToast("Your law firm account could not be found.");
             return;
         }
 
         const firmData = firmSnapshot.data();
 
-        // Verify account role
         if (firmData.role !== "lawfirm") {
-
             showToast(
                 "Access denied. This dashboard is for law firms only."
             );
 
             await signOut(auth);
-
             window.location.href = "../pages/login.html";
-
             return;
         }
 
         currentUser = user;
         currentFirmData = firmData;
 
-        const firmName =
-            firmData.firmName || "Law Firm";
+        const firmName = firmData.firmName || "Law Firm";
 
         updateFirmIdentity(firmName);
 
-        console.log(
-            "Firm account loaded:",
-            firmData
-        );
+        console.log("Firm account loaded:", firmData);
 
-        // Load public firm profile editor
         await loadPublicFirmProfile();
-        // Load incoming lawyer applications
         await loadFirmApplications();
 
     } catch (error) {
-
-        console.error(
-            "Error loading firm account:",
-            error
-        );
+        console.error("Error loading firm account:", error);
 
         showToast(
             "Unable to load your firm account. Please refresh."
         );
-
     }
-
 }
 
 
@@ -290,7 +216,6 @@ async function loadFirmProfile(user) {
 ========================================= */
 
 function updateFirmIdentity(firmName) {
-
     if (sidebarFirmName) {
         sidebarFirmName.textContent = firmName;
     }
@@ -300,13 +225,10 @@ function updateFirmIdentity(firmName) {
     }
 
     if (firmAvatar) {
-        firmAvatar.textContent =
-            firmName.charAt(0).toUpperCase();
+        firmAvatar.textContent = firmName.charAt(0).toUpperCase();
     }
 
-    document.title =
-        `${firmName} | HakiLink Dashboard`;
-
+    document.title = `${firmName} | HakiLink Dashboard`;
 }
 
 
@@ -315,13 +237,9 @@ function updateFirmIdentity(firmName) {
 ========================================= */
 
 async function loadPublicFirmProfile() {
-
-    if (!currentUser || !firmProfileContent) {
-        return;
-    }
+    if (!currentUser || !firmProfileContent) return;
 
     try {
-
         firmProfileContent.innerHTML = `
             <div class="firm-profile-loading">
                 Loading your firm profile...
@@ -334,19 +252,12 @@ async function loadPublicFirmProfile() {
             currentUser.uid
         );
 
-        const publicFirmSnapshot =
-            await getDoc(publicFirmRef);
+        const publicFirmSnapshot = await getDoc(publicFirmRef);
 
-        let publicData = {};
+        const publicData = publicFirmSnapshot.exists()
+            ? publicFirmSnapshot.data()
+            : {};
 
-        if (publicFirmSnapshot.exists()) {
-
-            publicData = publicFirmSnapshot.data();
-
-        }
-
-        // If no public profile exists yet,
-        // use the firm name from registration.
         const initialFirmName =
             publicData.firmName ||
             currentFirmData.firmName ||
@@ -355,44 +266,30 @@ async function loadPublicFirmProfile() {
         renderFirmProfileForm(publicData, initialFirmName);
 
     } catch (error) {
-
-        console.error(
-            "Error loading public firm profile:",
-            error
-        );
+        console.error("Error loading public firm profile:", error);
 
         firmProfileContent.innerHTML = `
             <p class="profile-error">
-                Unable to load your public firm profile.
-                Please refresh and try again.
+                Unable to load your firm profile. Please refresh and try again.
             </p>
         `;
 
-        showToast(
-            "Could not load your public firm profile."
-        );
-
+        showToast("Could not load your public firm profile.");
     }
-
 }
+
+
 /* =========================================
    LOAD LAWYER APPLICATIONS
 ========================================= */
 
 async function loadFirmApplications() {
-
-    if (!currentUser || !firmApplicationsList) {
-        return;
-    }
+    if (!currentUser || !firmApplicationsList) return;
 
     try {
-
         firmApplicationsList.innerHTML = `
             <p>Loading lawyer applications...</p>
         `;
-
-        // The firm ID must match the ID used
-        // when the lawyer submitted the application.
 
         const applicationsQuery = query(
             collection(db, "firmApplications"),
@@ -406,7 +303,7 @@ async function loadFirmApplications() {
             ...documentSnapshot.data()
         }));
 
-        // Sort newest applications first.
+        // Newest applications first.
         firmApplications.sort((a, b) => {
             const dateA = a.submittedAt?.toMillis?.() || 0;
             const dateB = b.submittedAt?.toMillis?.() || 0;
@@ -415,20 +312,12 @@ async function loadFirmApplications() {
         });
 
         updateApplicationStatistics();
-
         renderFirmApplications();
 
-        console.log(
-            "Firm applications loaded:",
-            firmApplications
-        );
+        console.log("Firm applications loaded:", firmApplications);
 
     } catch (error) {
-
-        console.error(
-            "Error loading firm applications:",
-            error
-        );
+        console.error("Error loading firm applications:", error);
 
         firmApplicationsList.innerHTML = `
             <p class="profile-error">
@@ -437,21 +326,16 @@ async function loadFirmApplications() {
             </p>
         `;
 
-        showToast(
-            "Could not load lawyer applications."
-        );
-
+        showToast("Could not load lawyer applications.");
     }
-
 }
 
 
 /* =========================================
-   UPDATE APPLICATION STATISTICS
+   APPLICATION STATISTICS
 ========================================= */
 
 function updateApplicationStatistics() {
-
     const total = firmApplications.length;
 
     const pending = firmApplications.filter(
@@ -477,25 +361,36 @@ function updateApplicationStatistics() {
     if (acceptedApplications) {
         acceptedApplications.textContent = accepted;
     }
-
 }
 
 
 /* =========================================
-   RENDER FIRM APPLICATIONS
+   SAFE HTML ESCAPING
 ========================================= */
+
+function escapeApplicationHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[character];
+    });
+}
 
 
 /* =========================================
-   RENDER FIRM APPLICATIONS
+   RENDER APPLICATION LIST
 ========================================= */
 
 function renderFirmApplications() {
-
     if (!firmApplicationsList) return;
 
     if (firmApplications.length === 0) {
-
         firmApplicationsList.innerHTML = `
             <div class="dashboard-panel">
                 <h3>No Applications Yet</h3>
@@ -510,14 +405,16 @@ function renderFirmApplications() {
     }
 
     firmApplicationsList.innerHTML = firmApplications.map(application => {
-
         const lawyerName = escapeApplicationHTML(
             application.lawyerName || "Unnamed Lawyer"
         );
 
-        const status = application.status || "pending";
+        const status = ["pending", "accepted", "declined", "withdrawn"]
+            .includes(application.status)
+            ? application.status
+            : "pending";
 
-        const safeStatus = escapeApplicationHTML(status);
+        const safeId = escapeApplicationHTML(application.id);
 
         return `
             <div class="dashboard-panel application-list-item">
@@ -525,29 +422,26 @@ function renderFirmApplications() {
                 <button
                     type="button"
                     class="applicant-name-button"
-                    data-application-id="${escapeApplicationHTML(application.id)}"
+                    data-application-id="${safeId}"
                 >
                     ${lawyerName}
                 </button>
 
-                <span class="application-status status-${safeStatus}">
-                    ${safeStatus.toUpperCase()}
+                <span class="application-status status-${status}">
+                    ${status.toUpperCase()}
                 </span>
 
             </div>
         `;
-
     }).join("");
-
 }
 
+
 /* =========================================
-   APPLICATION DETAILS MODAL
+   APPLICATION MODAL STYLES AND CREATION
 ========================================= */
 
 function createApplicationModal() {
-
-    // Avoid creating the modal more than once.
     if (document.getElementById("applicationDetailsModal")) {
         return;
     }
@@ -555,7 +449,6 @@ function createApplicationModal() {
     const modalStyles = document.createElement("style");
 
     modalStyles.textContent = `
-
         .application-list-item {
             display: flex;
             align-items: center;
@@ -666,13 +559,16 @@ function createApplicationModal() {
             padding: 25px;
         }
 
-        .application-modal-body h3 {
+        .application-modal-body h3,
+        .application-modal-body h4 {
             color: #0B2D52;
+        }
+
+        .application-modal-body h3 {
             margin: 0 0 8px;
         }
 
         .application-modal-body h4 {
-            color: #0B2D52;
             margin: 22px 0 7px;
         }
 
@@ -691,6 +587,7 @@ function createApplicationModal() {
             background: #F5F7FA;
             padding: 15px;
             border-radius: 8px;
+            margin-top: 18px;
         }
 
         .application-modal-actions {
@@ -706,6 +603,11 @@ function createApplicationModal() {
             font-weight: 600;
             cursor: pointer;
             border: none;
+        }
+
+        .application-modal-actions button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .modal-accept-button {
@@ -726,7 +628,6 @@ function createApplicationModal() {
         }
 
         @media (max-width: 600px) {
-
             .application-modal-overlay {
                 padding: 10px;
             }
@@ -750,9 +651,7 @@ function createApplicationModal() {
             .modal-close-button {
                 margin-left: 0;
             }
-
         }
-
     `;
 
     document.head.appendChild(modalStyles);
@@ -763,11 +662,14 @@ function createApplicationModal() {
     modal.className = "application-modal-overlay";
 
     modal.innerHTML = `
-        <div class="application-modal">
+        <div class="application-modal" role="dialog" aria-modal="true"
+             aria-labelledby="applicationModalTitle">
 
             <div class="application-modal-header">
 
-                <h2>Lawyer Application Details</h2>
+                <h2 id="applicationModalTitle">
+                    Lawyer Application Details
+                </h2>
 
                 <button
                     type="button"
@@ -790,19 +692,14 @@ function createApplicationModal() {
 
     document.body.appendChild(modal);
 
-    // Close button
     document.getElementById("closeApplicationModal")
         .addEventListener("click", closeApplicationModal);
 
-    // Close when clicking outside the modal
     modal.addEventListener("click", event => {
-
         if (event.target === modal) {
             closeApplicationModal();
         }
-
     });
-
 }
 
 
@@ -811,7 +708,6 @@ function createApplicationModal() {
 ========================================= */
 
 function openApplicationDetails(applicationId) {
-
     const application = firmApplications.find(
         item => item.id === applicationId
     );
@@ -823,13 +719,8 @@ function openApplicationDetails(applicationId) {
 
     createApplicationModal();
 
-    const modal = document.getElementById(
-        "applicationDetailsModal"
-    );
-
-    const modalContent = document.getElementById(
-        "applicationModalContent"
-    );
+    const modal = document.getElementById("applicationDetailsModal");
+    const modalContent = document.getElementById("applicationModalContent");
 
     const lawyerName = escapeApplicationHTML(
         application.lawyerName || "Unnamed Lawyer"
@@ -855,9 +746,10 @@ function openApplicationDetails(applicationId) {
         application.coverLetter || "No cover letter provided."
     );
 
-    const status = escapeApplicationHTML(
-        application.status || "pending"
-    );
+    const status = ["pending", "accepted", "declined", "withdrawn"]
+        .includes(application.status)
+        ? application.status
+        : "pending";
 
     const date = application.submittedAt?.toDate
         ? application.submittedAt.toDate().toLocaleDateString()
@@ -869,7 +761,6 @@ function openApplicationDetails(applicationId) {
 
     const documentsHTML = documents.length > 0
         ? documents.map(document => `
-
             <p>
                 <strong>
                     ${escapeApplicationHTML(
@@ -887,12 +778,13 @@ function openApplicationDetails(applicationId) {
                     )})
                 </span>
             </p>
-
         `).join("")
         : "<p>No supporting documents available.</p>";
 
-    const actionButtons = application.status === "pending"
-        ? `
+    let actionButtons = "";
+
+    if (status === "pending") {
+        actionButtons = `
             <div class="application-modal-actions">
 
                 <button
@@ -920,13 +812,12 @@ function openApplicationDetails(applicationId) {
                 </button>
 
             </div>
-        `
-        : `
+        `;
+    } else {
+        actionButtons = `
             <div class="application-modal-actions">
 
-                <p>
-                    This application has already been reviewed.
-                </p>
+                <p>This application has already been reviewed.</p>
 
                 <button
                     type="button"
@@ -938,9 +829,9 @@ function openApplicationDetails(applicationId) {
 
             </div>
         `;
+    }
 
     modalContent.innerHTML = `
-
         <div class="application-modal-section">
 
             <h3>${lawyerName}</h3>
@@ -950,7 +841,7 @@ function openApplicationDetails(applicationId) {
             </span>
 
             <p>
-                <strong>Submitted:</strong> ${date}
+                <strong>Submitted:</strong> ${escapeApplicationHTML(date)}
             </p>
 
         </div>
@@ -991,80 +882,40 @@ function openApplicationDetails(applicationId) {
         </div>
 
         ${actionButtons}
-
     `;
 
-    // Bottom close button
     document.getElementById("modalBottomCloseButton")
         ?.addEventListener("click", closeApplicationModal);
 
-    // Accept application
     modalContent.querySelector(".modal-accept-button")
         ?.addEventListener("click", async event => {
-
             const id = event.currentTarget.dataset.applicationId;
-
             await reviewFirmApplication(id, "accepted");
-
         });
 
-    // Decline application
     modalContent.querySelector(".modal-decline-button")
         ?.addEventListener("click", async event => {
-
             const id = event.currentTarget.dataset.applicationId;
-
             await reviewFirmApplication(id, "declined");
-
         });
 
     modal.classList.add("active");
-
     document.body.style.overflow = "hidden";
-
 }
 
 
 /* =========================================
-   CLOSE APPLICATION DETAILS
+   CLOSE APPLICATION MODAL
 ========================================= */
 
 function closeApplicationModal() {
-
-    const modal = document.getElementById(
-        "applicationDetailsModal"
-    );
+    const modal = document.getElementById("applicationDetailsModal");
 
     if (modal) {
         modal.classList.remove("active");
     }
 
     document.body.style.overflow = "";
-
-}
-
-
-
-/* =========================================
-   ESCAPE USER-SUPPLIED CONTENT
-========================================= */
-
-function escapeApplicationHTML(value) {
-
-    return String(value).replace(/[&<>"']/g, character => {
-
-        const entities = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        };
-
-        return entities[character];
-
-    });
-
 }
 
 
@@ -1073,13 +924,10 @@ function escapeApplicationHTML(value) {
 ========================================= */
 
 function renderFirmProfileForm(profileData, initialFirmName) {
-
     if (!firmProfileContent) return;
 
     firmProfileContent.innerHTML = `
-
         <style>
-
             .firm-profile-form {
                 background: #FFFFFF;
                 padding: 25px;
@@ -1159,17 +1007,12 @@ function renderFirmProfileForm(profileData, initialFirmName) {
                 color: #B42318;
                 padding: 15px;
             }
-
         </style>
 
         <form id="firmProfileForm" class="firm-profile-form">
 
             <div class="form-group">
-
-                <label for="publicFirmName">
-                    Law Firm Name *
-                </label>
-
+                <label for="publicFirmName">Law Firm Name *</label>
                 <input
                     type="text"
                     id="publicFirmName"
@@ -1177,16 +1020,10 @@ function renderFirmProfileForm(profileData, initialFirmName) {
                     placeholder="Enter your law firm's name"
                     required
                 >
-
             </div>
 
-
             <div class="form-group">
-
-                <label for="publicFirmLocation">
-                    Firm Location *
-                </label>
-
+                <label for="publicFirmLocation">Firm Location *</label>
                 <input
                     type="text"
                     id="publicFirmLocation"
@@ -1194,36 +1031,21 @@ function renderFirmProfileForm(profileData, initialFirmName) {
                     placeholder="e.g. Nyeri, Kenya"
                     required
                 >
-
             </div>
 
-
             <div class="form-group">
-
-                <label for="publicFirmDescription">
-                    About Your Firm *
-                </label>
-
+                <label for="publicFirmDescription">About Your Firm *</label>
                 <textarea
                     id="publicFirmDescription"
                     maxlength="2000"
                     placeholder="Describe your law firm, experience and services..."
                     required
                 ></textarea>
-
-                <span class="form-hint">
-                    Maximum 2,000 characters.
-                </span>
-
+                <span class="form-hint">Maximum 2,000 characters.</span>
             </div>
 
-
             <div class="form-group">
-
-                <label for="publicFirmPracticeAreas">
-                    Practice Areas *
-                </label>
-
+                <label for="publicFirmPracticeAreas">Practice Areas *</label>
                 <input
                     type="text"
                     id="publicFirmPracticeAreas"
@@ -1231,13 +1053,10 @@ function renderFirmProfileForm(profileData, initialFirmName) {
                     placeholder="e.g. Criminal Law, Family Law, Corporate Law"
                     required
                 >
-
                 <span class="form-hint">
                     Separate each practice area using a comma.
                 </span>
-
             </div>
-
 
             <button
                 type="submit"
@@ -1252,14 +1071,9 @@ function renderFirmProfileForm(profileData, initialFirmName) {
             </p>
 
         </form>
-
     `;
 
-
-    // Populate form fields safely
-
-    document.getElementById("publicFirmName").value =
-        initialFirmName;
+    document.getElementById("publicFirmName").value = initialFirmName;
 
     document.getElementById("publicFirmLocation").value =
         profileData.location || "";
@@ -1272,17 +1086,8 @@ function renderFirmProfileForm(profileData, initialFirmName) {
             ? profileData.practiceAreas.join(", ")
             : "";
 
-
-    // Attach form submission event
-
-    const firmProfileForm =
-        document.getElementById("firmProfileForm");
-
-    firmProfileForm.addEventListener(
-        "submit",
-        saveFirmProfile
-    );
-
+    document.getElementById("firmProfileForm")
+        .addEventListener("submit", saveFirmProfile);
 }
 
 
@@ -1291,34 +1096,25 @@ function renderFirmProfileForm(profileData, initialFirmName) {
 ========================================= */
 
 async function saveFirmProfile(event) {
-
     event.preventDefault();
 
     if (!currentUser) {
-
         showToast("Please log in again.");
-
         return;
     }
 
-    const firmName =
-        document.getElementById("publicFirmName")
-            .value.trim();
+    const firmName = document.getElementById("publicFirmName")
+        .value.trim();
 
-    const location =
-        document.getElementById("publicFirmLocation")
-            .value.trim();
+    const location = document.getElementById("publicFirmLocation")
+        .value.trim();
 
-    const description =
-        document.getElementById("publicFirmDescription")
-            .value.trim();
+    const description = document.getElementById("publicFirmDescription")
+        .value.trim();
 
-    const practiceAreasInput =
-        document.getElementById("publicFirmPracticeAreas")
-            .value.trim();
-
-
-    // Convert comma-separated practice areas into an array
+    const practiceAreasInput = document.getElementById(
+        "publicFirmPracticeAreas"
+    ).value.trim();
 
     const practiceAreas = [
         ...new Set(
@@ -1329,69 +1125,31 @@ async function saveFirmProfile(event) {
         )
     ];
 
-
-    // Basic validation
-
-    if (
-        !firmName ||
-        !location ||
-        !description ||
-        practiceAreas.length === 0
-    ) {
-
-        showToast(
-            "Please complete all firm profile fields."
-        );
-
+    if (!firmName || !location || !description || practiceAreas.length === 0) {
+        showToast("Please complete all firm profile fields.");
         return;
     }
 
-    const saveButton =
-        document.getElementById("saveFirmProfileButton");
-
-    const statusMessage =
-        document.getElementById("firmProfileStatus");
+    const saveButton = document.getElementById("saveFirmProfileButton");
+    const statusMessage = document.getElementById("firmProfileStatus");
 
     saveButton.disabled = true;
-
     saveButton.textContent = "Saving...";
-
-    statusMessage.textContent =
-        "Saving your firm profile...";
-
+    statusMessage.textContent = "Saving your firm profile...";
 
     try {
-
-        const publicFirmRef = doc(
-            db,
-            "publicFirms",
-            currentUser.uid
-        );
-
-        const existingProfile =
-            await getDoc(publicFirmRef);
-
+        const publicFirmRef = doc(db, "publicFirms", currentUser.uid);
+        const existingProfile = await getDoc(publicFirmRef);
 
         const profileData = {
-
             firmId: currentUser.uid,
-
-            firmName: firmName,
-
-            location: location,
-
-            description: description,
-
-            practiceAreas: practiceAreas
-
+            firmName,
+            location,
+            description,
+            practiceAreas
         };
 
-
         if (existingProfile.exists()) {
-
-            // UPDATE EXISTING PUBLIC PROFILE
-            // Keep original createdAt unchanged.
-
             await setDoc(
                 publicFirmRef,
                 {
@@ -1400,189 +1158,52 @@ async function saveFirmProfile(event) {
                 },
                 { merge: true }
             );
-
         } else {
-
-            // CREATE NEW PUBLIC PROFILE
-
-            await setDoc(
-                publicFirmRef,
-                {
-                    ...profileData,
-                    createdAt: serverTimestamp()
-                }
-            );
-
+            await setDoc(publicFirmRef, {
+                ...profileData,
+                createdAt: serverTimestamp()
+            });
         }
 
-
-        // Update dashboard identity
-
         currentFirmData.firmName = firmName;
-
         updateFirmIdentity(firmName);
-
 
         statusMessage.textContent =
             "Your firm profile has been saved successfully.";
 
-        showToast(
-            "Firm profile saved successfully!"
-        );
-
         saveButton.textContent = "Update Firm Profile";
 
-
-        console.log(
-            "Public firm profile saved:",
-            profileData
-        );
+        showToast("Firm profile saved successfully!");
 
     } catch (error) {
-
-        console.error(
-            "Error saving firm profile:",
-            error
-        );
+        console.error("Error saving firm profile:", error);
 
         statusMessage.textContent =
             "Unable to save your profile. Please try again.";
 
-        showToast(
-            "Profile saving failed: " + error.message
-        );
+        showToast("Profile saving failed: " + error.message);
 
     } finally {
-
         saveButton.disabled = false;
 
-        if (
-            saveButton.textContent === "Saving..."
-        ) {
+        if (saveButton.textContent === "Saving...") {
             saveButton.textContent = "Save Firm Profile";
         }
-
     }
-
 }
 
-
-/* =========================================
-   FIREBASE AUTHENTICATION
-========================================= */
-
-onAuthStateChanged(auth, async (user) => {
-
-    if (!user) {
-
-        window.location.href = "../pages/login.html";
-
-        return;
-    }
-
-    await loadFirmProfile(user);
-
-});
-
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-logoutButton?.addEventListener("click", async () => {
-
-    try {
-
-        await signOut(auth);
-
-        window.location.href = "../pages/login.html";
-
-    } catch (error) {
-
-        console.error("Logout error:", error);
-
-        showToast(
-            "Unable to log out. Please try again."
-        );
-
-    }
-
-});
-
-
-/* =========================================
-   ADD LAWYER BUTTON
-========================================= */
-
-addLawyerButton?.addEventListener("click", () => {
-
-    showToast(
-        "Lawyer management will be implemented next."
-    );
-
-});
-
-
-/* =========================================
-   TOAST NOTIFICATIONS
-========================================= */
-
-function showToast(message) {
-
-    let toast = document.getElementById("firmToast");
-
-    if (!toast) {
-
-        toast = document.createElement("div");
-
-        toast.id = "firmToast";
-
-        Object.assign(toast.style, {
-
-            position: "fixed",
-            bottom: "25px",
-            right: "25px",
-            maxWidth: "350px",
-            padding: "15px 20px",
-            background: "#061F36",
-            color: "#FFFFFF",
-            borderLeft: "4px solid #D9A928",
-            borderRadius: "8px",
-            boxShadow: "0 5px 20px rgba(0,0,0,0.15)",
-            fontSize: "13px",
-            lineHeight: "1.5",
-            zIndex: "9999"
-
-        });
-
-        document.body.appendChild(toast);
-
-    }
-
-    toast.textContent = message;
-
-    toast.style.display = "block";
-
-    clearTimeout(toast.hideTimer);
-
-    toast.hideTimer = setTimeout(() => {
-
-        toast.style.display = "none";
-
-    }, 3500);
-
-}
 
 /* =========================================
    REVIEW LAWYER APPLICATION
 ========================================= */
 
 async function reviewFirmApplication(applicationId, decision) {
-
     if (!currentUser || !currentFirmData) {
         showToast("Please log in again.");
         return;
     }
+
+    if (isReviewingApplication) return;
 
     const application = firmApplications.find(
         item => item.id === applicationId
@@ -1605,7 +1226,6 @@ async function reviewFirmApplication(applicationId, decision) {
     let decisionNote = "";
 
     if (decision === "accepted") {
-
         const confirmed = confirm(
             `Are you sure you want to accept ${application.lawyerName}?`
         );
@@ -1613,7 +1233,6 @@ async function reviewFirmApplication(applicationId, decision) {
         if (!confirmed) return;
 
     } else {
-
         decisionNote = prompt(
             "Enter a reason for declining this application:"
         );
@@ -1626,10 +1245,19 @@ async function reviewFirmApplication(applicationId, decision) {
             showToast("Please provide a reason for declining.");
             return;
         }
-
     }
 
     try {
+        isReviewingApplication = true;
+
+        const actionButtons = document.querySelectorAll(
+            ".modal-accept-button, .modal-decline-button"
+        );
+
+        actionButtons.forEach(button => {
+            button.disabled = true;
+            button.textContent = "Processing...";
+        });
 
         showToast("Processing application decision...");
 
@@ -1652,11 +1280,8 @@ async function reviewFirmApplication(applicationId, decision) {
 
         batch.update(applicationRef, updateData);
 
-        // Acceptance must also create the affiliation
-        // in the same atomic batch.
-
+        // Create firm-lawyer affiliation atomically with acceptance.
         if (decision === "accepted") {
-
             const affiliationId =
                 `${application.firmId}_${application.lawyerId}`;
 
@@ -1667,24 +1292,16 @@ async function reviewFirmApplication(applicationId, decision) {
             );
 
             batch.set(affiliationRef, {
-
                 firmId: application.firmId,
-
                 lawyerId: application.lawyerId,
-
-                applicationId: applicationId,
-
+                applicationId,
                 status: "active",
-
                 joinedAt: serverTimestamp()
-
             });
-
         }
 
         await batch.commit();
 
-        // Close the application details modal
         closeApplicationModal();
 
         showToast(
@@ -1693,55 +1310,141 @@ async function reviewFirmApplication(applicationId, decision) {
                 : "Application declined successfully."
         );
 
-        // Refresh the applications list
         await loadFirmApplications();
 
     } catch (error) {
-
-        console.error(
-            "Application review error:",
-            error
-        );
+        console.error("Application review error:", error);
 
         showToast(
             "Unable to process application: " + error.message
         );
 
-    }
+        // Re-enable buttons if the operation failed.
+        document.querySelectorAll(
+            ".modal-accept-button, .modal-decline-button"
+        ).forEach(button => {
+            button.disabled = false;
+            button.textContent = button.classList.contains(
+                "modal-accept-button"
+            )
+                ? "Accept Application"
+                : "Decline Application";
+        });
 
+    } finally {
+        isReviewingApplication = false;
+    }
 }
 
 
 /* =========================================
-   APPLICATION ACTION EVENTS
-========================================= */
-
-
-/* =========================================
-   APPLICATION LIST EVENTS
+   APPLICATION LIST CLICK EVENTS
 ========================================= */
 
 firmApplicationsList?.addEventListener("click", event => {
-
     const applicantButton = event.target.closest(
         ".applicant-name-button"
     );
 
     if (!applicantButton) return;
 
-    const applicationId =
-        applicantButton.dataset.applicationId;
+    const applicationId = applicantButton.dataset.applicationId;
 
     openApplicationDetails(applicationId);
-
 });
+
+
+/* =========================================
+   FIREBASE AUTHENTICATION
+========================================= */
+
+onAuthStateChanged(auth, async user => {
+    if (!user) {
+        window.location.href = "../pages/login.html";
+        return;
+    }
+
+    await loadFirmProfile(user);
+});
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+logoutButton?.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+        window.location.href = "../pages/login.html";
+
+    } catch (error) {
+        console.error("Logout error:", error);
+        showToast("Unable to log out. Please try again.");
+    }
+});
+
+
+/* =========================================
+   ADD LAWYER BUTTON
+========================================= */
+
+addLawyerButton?.addEventListener("click", () => {
+    showToast("Lawyer management will be implemented next.");
+});
+
+
+/* =========================================
+   REFRESH APPLICATIONS
+========================================= */
+
+refreshApplicationsButton?.addEventListener("click", () => {
+    loadFirmApplications();
+});
+
+
+/* =========================================
+   TOAST NOTIFICATIONS
+========================================= */
+
+function showToast(message) {
+    let toast = document.getElementById("firmToast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "firmToast";
+
+        Object.assign(toast.style, {
+            position: "fixed",
+            bottom: "25px",
+            right: "25px",
+            maxWidth: "350px",
+            padding: "15px 20px",
+            background: "#061F36",
+            color: "#FFFFFF",
+            borderLeft: "4px solid #D9A928",
+            borderRadius: "8px",
+            boxShadow: "0 5px 20px rgba(0,0,0,0.15)",
+            fontSize: "13px",
+            lineHeight: "1.5",
+            zIndex: "11000"
+        });
+
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.style.display = "block";
+
+    clearTimeout(toast.hideTimer);
+
+    toast.hideTimer = setTimeout(() => {
+        toast.style.display = "none";
+    }, 3500);
+}
+
 
 /* =========================================
    INITIAL DASHBOARD STATE
 ========================================= */
 
 openSection("overview");
-refreshApplicationsButton?.addEventListener(
-    "click",
-    loadFirmApplications
-);
