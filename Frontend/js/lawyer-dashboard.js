@@ -153,9 +153,14 @@ function formatDate(value) {
 
     let date;
 
-    if (typeof value.toDate === "function") {
+    if (value instanceof Date) {
+        date = value;
+    } else if (typeof value.toDate === "function") {
         date = value.toDate();
-    } else if (typeof value === "string" || typeof value === "number") {
+    } else if (
+        typeof value === "string" ||
+        typeof value === "number"
+    ) {
         date = new Date(value);
     } else if (typeof value.seconds === "number") {
         date = new Date(value.seconds * 1000);
@@ -1586,6 +1591,26 @@ messageForm?.addEventListener("submit", async (event) => {
                 createdAt: serverTimestamp()
             }
         );
+        // Display the sent message immediately in the lawyer's chat.
+        const container = $("messagesList");
+
+        const bubble = element(
+            "div",
+            "message-bubble mine"
+        );
+
+        bubble.appendChild(
+            element("div", "", text)
+        );
+
+        bubble.appendChild(
+            element("span", "message-meta", formatDate(new Date()))
+        );
+
+        container.appendChild(bubble);
+
+        // Scroll to the latest message.
+        container.scrollTop = container.scrollHeight;
 
         console.log("Step 1 successful: Message saved.");
 

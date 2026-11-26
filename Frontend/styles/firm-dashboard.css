@@ -1,0 +1,529 @@
+
+/* =========================================
+   HAKILINK LAW FIRM DASHBOARD
+========================================= */
+
+:root {
+    --navy: #0B2D52;
+    --navy-dark: #061F36;
+    --navy-light: #123F6B;
+
+    --gold: #D9A928;
+    --gold-light: #F2D36A;
+
+    --background: #F5F7FA;
+    --white: #FFFFFF;
+
+    --text-dark: #10243A;
+    --text-medium: #66788A;
+
+    --border: #DCE3EA;
+    --success: #198754;
+    --danger: #DC3545;
+
+    --shadow: 0 4px 18px rgba(6, 31, 54, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text-dark);
+}
+
+button,
+textarea,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* MAIN LAYOUT */
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 250px;
+    min-width: 250px;
+    background: var(--navy-dark);
+    color: var(--white);
+    padding: 25px 17px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 8px 27px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-brand img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.sidebar-brand h2 {
+    font-size: 22px;
+    color: var(--gold);
+}
+
+.firm-info {
+    padding: 23px 10px;
+}
+
+.firm-info h3 {
+    font-size: 15px;
+    margin-bottom: 7px;
+    overflow-wrap: anywhere;
+}
+
+.firm-info p {
+    font-size: 12px;
+    color: #B8C7D8;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.nav-link {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #D5DFE9;
+    text-align: left;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.09);
+    color: var(--white);
+}
+
+.nav-link.active {
+    background: var(--gold);
+    color: var(--navy-dark);
+    font-weight: 700;
+}
+
+.nav-link span {
+    min-width: 21px;
+    height: 21px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    background: var(--gold);
+    color: var(--navy-dark);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.nav-link.active span {
+    background: var(--navy);
+    color: var(--white);
+}
+
+.logout-button {
+    margin-top: auto;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--white);
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.logout-button:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+}
+
+/* MAIN CONTENT */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+    color: var(--navy);
+    font-size: 25px;
+    margin-bottom: 7px;
+}
+
+.topbar p {
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+.topbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#firmAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--navy);
+    color: var(--gold);
+    font-weight: 700;
+}
+
+/* DASHBOARD SECTIONS */
+
+.dashboard-section {
+    display: none;
+    animation: fadeIn 0.25s ease;
+}
+
+.dashboard-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.section-heading h2 {
+    font-size: 21px;
+    color: var(--navy);
+    margin-bottom: 7px;
+}
+
+.section-heading p {
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+/* STATISTICS */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 23px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--gold);
+}
+
+.stat-card h3 {
+    color: var(--text-medium);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.stat-card strong {
+    color: var(--navy);
+    font-size: 29px;
+}
+
+/* GENERAL PANELS */
+
+.dashboard-panel {
+    background: var(--white);
+    padding: 23px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.dashboard-panel h3 {
+    color: var(--navy);
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.dashboard-panel p {
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+/* GENERAL BUTTONS */
+
+.section-heading button,
+.dashboard-section button:not(.nav-link):not(.logout-button) {
+    padding: 11px 17px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.section-heading button:hover,
+.dashboard-section button:not(.nav-link):not(.logout-button):hover {
+    background: var(--navy-light);
+}
+
+/* LISTS AND CARDS */
+
+#lawyersList,
+#firmRequestsList,
+#firmAppointmentsList,
+#firmNotificationsList,
+#firmProfileContent,
+#firmSettingsContent {
+    display: grid;
+    gap: 15px;
+}
+
+#lawyersList > *,
+#firmRequestsList > *,
+#firmAppointmentsList > *,
+#firmNotificationsList > *,
+#firmProfileContent > *,
+#firmSettingsContent > * {
+    background: var(--white);
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* MESSAGING */
+
+.messages-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    min-height: 480px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#firmConversationsList {
+    padding: 15px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+}
+
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+#firmChatMessages {
+    flex: 1;
+    min-height: 350px;
+    padding: 20px;
+    overflow-y: auto;
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+.message-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.message-form textarea {
+    flex: 1;
+    min-width: 0;
+    min-height: 45px;
+    max-height: 130px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    resize: none;
+    outline: none;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.message-form textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(217,169,40,0.13);
+}
+
+.message-form button {
+    min-height: 45px;
+    padding: 0 19px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+}
+
+.message-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 1100px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .messages-layout {
+        grid-template-columns: 250px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 760px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .sidebar-brand {
+        padding-bottom: 14px;
+    }
+
+    .firm-info {
+        padding: 13px 8px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .nav-link {
+        width: auto;
+        min-width: max-content;
+        padding: 11px 13px;
+    }
+
+    .logout-button {
+        margin-top: 10px;
+    }
+
+    .main-content {
+        padding: 20px 15px;
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .topbar h1 {
+        font-size: 20px;
+    }
+
+    .topbar-profile {
+        font-size: 11px;
+    }
+
+    .messages-layout {
+        grid-template-columns: 1fr;
+    }
+
+    #firmConversationsList {
+        max-height: 190px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .topbar-profile span {
+        display: none;
+    }
+
+    .message-form {
+        padding: 10px;
+        gap: 7px;
+    }
+
+    .message-form button {
+        padding: 0 13px;
+    }
+}

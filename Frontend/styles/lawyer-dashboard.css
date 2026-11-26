@@ -905,27 +905,28 @@ button:disabled {
 }
 .message-form textarea {
     flex: 1;
+    display: block;
     min-width: 0;
     width: 100%;
-    min-height: 48px;
-    max-height: 140px;
-    padding: 13px 15px;
+    min-height: 85px;
+    max-height: 180px;
+    padding: 14px 16px;
 
     border: 1px solid var(--border);
     border-radius: 12px;
 
-    background: #F8FAFC;
-    color: var(--text-dark);
+    background: #FFFFFF;
+    color: #10243A;
 
     font-family: inherit;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.6;
 
-    resize: none;
+    resize: vertical;
     overflow-y: auto;
+    box-sizing: border-box;
 
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .message-form textarea:focus {
@@ -936,6 +937,7 @@ button:disabled {
 
 .message-form textarea::placeholder {
     color: var(--text-medium);
+    opacity: 1;
 }
 .message-form button {
     flex-shrink: 0;

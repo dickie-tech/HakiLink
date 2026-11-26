@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Law Firm Dashboard | HakiLink</title>
+
+    <link rel="stylesheet" href="../styles/firm-dashboard.css">
+  </head>
+
+  <body>
+
+    <div class="dashboard-container">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+
+        <div class="sidebar-brand">
+          <img src="../assets/hakilink-logo.jpg" alt="HakiLink Logo">
+          <h2>HakiLink</h2>
+        </div>
+
+        <div class="firm-info">
+          <h3 id="sidebarFirmName">Law Firm</h3>
+          <p>Firm Account</p>
+        </div>
+
+        <nav class="sidebar-nav">
+
+          <button class="nav-link active" data-section="overview">
+            Overview
+          </button>
+
+          <button class="nav-link" data-section="firm-profile">
+            Firm Profile
+          </button>
+
+          <button class="nav-link" data-section="lawyers">
+            Our Lawyers
+          </button>
+
+          <button class="nav-link" data-section="requests">
+            Consultation Requests
+            <span id="requestCount">0</span>
+          </button>
+
+          <button class="nav-link" data-section="appointments">
+            Appointments
+          </button>
+
+          <button class="nav-link" data-section="messages">
+            Messages
+            <span id="messagesCount">0</span>
+          </button>
+
+          <button class="nav-link" data-section="notifications">
+            Notifications
+          </button>
+
+          <button class="nav-link" data-section="settings">
+            Settings
+          </button>
+
+        </nav>
+
+        <button id="logoutButton" class="logout-button">
+          Logout
+        </button>
+
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+
+        <header class="topbar">
+
+          <div>
+            <h1 id="welcomeHeading">Welcome to HakiLink</h1>
+            <p>Manage your law firm and legal team.</p>
+          </div>
+
+          <div class="topbar-profile">
+            <span id="topbarFirmName">Law Firm</span>
+            <div id="firmAvatar">F</div>
+          </div>
+
+        </header>
+
+        <!-- OVERVIEW -->
+        <section id="overview" class="dashboard-section active">
+
+          <div class="section-heading">
+            <h2>Firm Overview</h2>
+            <p>Here's what's happening at your firm.</p>
+          </div>
+
+          <div class="stats-grid">
+
+            <div class="stat-card">
+              <h3>Total Lawyers</h3>
+              <strong id="totalLawyers">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <h3>Pending Requests</h3>
+              <strong id="pendingRequests">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <h3>Appointments</h3>
+              <strong id="totalAppointments">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <h3>Client Conversations</h3>
+              <strong id="totalConversations">0</strong>
+            </div>
+
+          </div>
+
+          <div class="dashboard-panel">
+            <h3>Recent Activity</h3>
+            <div id="recentActivity">
+              <p>No recent activity yet.</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- FIRM PROFILE -->
+        <section id="firm-profile" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Firm Profile</h2>
+            <p>Manage your firm's public information.</p>
+          </div>
+
+          <div id="firmProfileContent"></div>
+        </section>
+
+        <!-- LAWYERS -->
+        <section id="lawyers" class="dashboard-section">
+          <div class="section-heading">
+            <div>
+              <h2>Our Lawyers</h2>
+              <p>Manage lawyers affiliated with your firm.</p>
+            </div>
+
+            <button id="addLawyerButton">
+              + Add Lawyer
+            </button>
+          </div>
+
+          <div id="lawyersList"></div>
+        </section>
+
+        <!-- CONSULTATION REQUESTS -->
+        <section id="requests" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Consultation Requests</h2>
+            <p>Review and manage requests from clients.</p>
+          </div>
+
+          <div id="firmRequestsList"></div>
+        </section>
+
+        <!-- APPOINTMENTS -->
+        <section id="appointments" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Appointments</h2>
+            <p>Manage your firm's consultations.</p>
+          </div>
+
+          <div id="firmAppointmentsList"></div>
+        </section>
+
+        <!-- MESSAGES -->
+        <section id="messages" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Messages</h2>
+            <p>Communicate with your clients.</p>
+          </div>
+
+          <div class="messages-layout">
+
+            <div id="firmConversationsList">
+              <p>No conversations yet.</p>
+            </div>
+
+            <div class="chat-panel">
+              <div id="firmChatMessages">
+                Select a conversation to start messaging.
+              </div>
+
+              <form id="firmMessageForm" class="message-form">
+                <textarea
+                  id="firmMessageInput"
+                  placeholder="Write your message..."
+                  rows="1"
+                  maxlength="4000"
+                  disabled></textarea>
+
+                <button type="submit" id="firmSendButton" disabled>
+                  Send
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- NOTIFICATIONS -->
+        <section id="notifications" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Notifications</h2>
+            <p>Stay updated on your firm's activities.</p>
+          </div>
+
+          <div id="firmNotificationsList"></div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings" class="dashboard-section">
+          <div class="section-heading">
+            <h2>Settings</h2>
+            <p>Manage your account preferences.</p>
+          </div>
+
+          <div id="firmSettingsContent"></div>
+        </section>
+
+      </main>
+
+    </div>
+
+    <script type="module" src="../js/firm-dashboard.js"></script>
+
+  </body>
+</html>
