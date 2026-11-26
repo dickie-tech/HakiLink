@@ -48,7 +48,8 @@ const logoutButton =
 
 const firmProfileContent =
     document.getElementById("firmProfileContent");
-
+const menuButton = document.getElementById("menuButton");
+const sidebar = document.getElementById("sidebar");
 
 /* =========================================
    GLOBAL STATE
@@ -140,6 +141,77 @@ navLinks.forEach(link => {
     });
 
 });
+
+/* =========================================
+   MOBILE SIDEBAR MENU
+========================================= */
+
+function closeSidebar() {
+
+    if (!sidebar || !menuButton) return;
+
+    sidebar.classList.remove("open");
+
+    menuButton.setAttribute("aria-expanded", "false");
+
+}
+
+function toggleSidebar() {
+
+    if (!sidebar || !menuButton) return;
+
+    const isOpen = sidebar.classList.toggle("open");
+
+    menuButton.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+    );
+
+}
+
+// Toggle hamburger menu
+menuButton?.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    toggleSidebar();
+
+});
+
+// Close when clicking outside the sidebar
+document.addEventListener("click", event => {
+
+    if (!sidebar || !menuButton) return;
+
+    const clickedOutside =
+        !sidebar.contains(event.target) &&
+        !menuButton.contains(event.target);
+
+    if (
+        sidebar.classList.contains("open") &&
+        clickedOutside
+    ) {
+        closeSidebar();
+    }
+
+});
+
+// Close after selecting a navigation item
+navLinks.forEach(link => {
+
+    link.addEventListener("click", closeSidebar);
+
+});
+
+// Close when pressing Escape
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+        closeSidebar();
+    }
+
+});
+
 
 
 /* =========================================
