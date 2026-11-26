@@ -12,6 +12,6 @@
   "type": "commonjs",
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",
-    "firebase-admin": "^14.5.1"
+    "firebase-admin": "^13.10.0"
   }
 }
