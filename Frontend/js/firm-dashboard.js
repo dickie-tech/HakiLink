@@ -14,7 +14,8 @@ import {
     collection,
     getDocs,
     query,
-    where
+    where,
+    writeBatch
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -521,6 +522,33 @@ function renderFirmApplications() {
                     }
 
                 </div>
+                <div class="application-actions">
+
+                ${
+                    application.status === "pending"
+                    ? `
+                        <button
+                            class="accept-application-button"
+                            data-application-id="${application.id}"
+                        >
+                            Accept Application
+                        </button>
+
+                        <button
+                            class="decline-application-button"
+                            data-application-id="${application.id}"
+                        >
+                            Decline Application
+                        </button>
+                    `
+                    : `
+                        <p class="application-decision-message">
+                            This application has already been reviewed.
+                        </p>
+                    `
+                }
+
+            </div>
 
             </div>
         `;
@@ -1058,7 +1086,174 @@ function showToast(message) {
 
 }
 
+/* =========================================
+   REVIEW LAWYER APPLICATION
+========================================= */
 
+async function reviewFirmApplication(applicationId, decision) {
+
+    if (!currentUser || !currentFirmData) {
+        showToast("Please log in again.");
+        return;
+    }
+
+    const application = firmApplications.find(
+        item => item.id === applicationId
+    );
+
+    if (!application) {
+        showToast("Application could not be found.");
+        return;
+    }
+
+    if (application.status !== "pending") {
+        showToast("This application has already been reviewed.");
+        return;
+    }
+
+    if (!["accepted", "declined"].includes(decision)) {
+        return;
+    }
+
+    let decisionNote = "";
+
+    if (decision === "accepted") {
+
+        const confirmed = confirm(
+            `Are you sure you want to accept ${application.lawyerName}?`
+        );
+
+        if (!confirmed) return;
+
+    } else {
+
+        decisionNote = prompt(
+            "Enter a reason for declining this application:"
+        );
+
+        if (decisionNote === null) return;
+
+        decisionNote = decisionNote.trim();
+
+        if (!decisionNote) {
+            showToast("Please provide a reason for declining.");
+            return;
+        }
+
+    }
+
+    try {
+
+        showToast("Processing application decision...");
+
+        const batch = writeBatch(db);
+
+        const applicationRef = doc(
+            db,
+            "firmApplications",
+            applicationId
+        );
+
+        const updateData = {
+            status: decision,
+            reviewedAt: serverTimestamp()
+        };
+
+        if (decisionNote) {
+            updateData.decisionNote = decisionNote;
+        }
+
+        batch.update(applicationRef, updateData);
+
+        // Acceptance must also create the affiliation
+        // in the same atomic batch.
+
+        if (decision === "accepted") {
+
+            const affiliationId =
+                `${application.firmId}_${application.lawyerId}`;
+
+            const affiliationRef = doc(
+                db,
+                "firmLawyers",
+                affiliationId
+            );
+
+            batch.set(affiliationRef, {
+
+                firmId: application.firmId,
+
+                lawyerId: application.lawyerId,
+
+                applicationId: applicationId,
+
+                status: "active",
+
+                joinedAt: serverTimestamp()
+
+            });
+
+        }
+
+        await batch.commit();
+
+        showToast(
+            decision === "accepted"
+                ? "Lawyer successfully accepted!"
+                : "Application declined successfully."
+        );
+
+        await loadFirmApplications();
+
+    } catch (error) {
+
+        console.error(
+            "Application review error:",
+            error
+        );
+
+        showToast(
+            "Unable to process application: " + error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   APPLICATION ACTION EVENTS
+========================================= */
+
+firmApplicationsList?.addEventListener("click", event => {
+
+    const acceptButton = event.target.closest(
+        ".accept-application-button"
+    );
+
+    const declineButton = event.target.closest(
+        ".decline-application-button"
+    );
+
+    if (acceptButton) {
+
+        reviewFirmApplication(
+            acceptButton.dataset.applicationId,
+            "accepted"
+        );
+
+    }
+
+    if (declineButton) {
+
+        reviewFirmApplication(
+            declineButton.dataset.applicationId,
+            "declined"
+        );
+
+    }
+
+});
 /* =========================================
    INITIAL DASHBOARD STATE
 ========================================= */

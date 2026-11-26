@@ -702,3 +702,59 @@ button {
     }
 
 }
+
+/* =========================================
+   APPLICATION REVIEW ACTIONS
+========================================= */
+
+.application-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.application-actions button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.accept-application-button {
+    background: #0B2D52;
+    color: #FFFFFF;
+}
+
+.accept-application-button:hover {
+    background: #061F36;
+}
+
+.decline-application-button {
+    background: #FFFFFF;
+    color: #B42318;
+    border: 1px solid #B42318 !important;
+}
+
+.decline-application-button:hover {
+    background: #FFF1F0;
+}
+
+.application-decision-message {
+    color: #66788A;
+    font-size: 13px;
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .application-actions {
+        flex-direction: column;
+    }
+
+    .application-actions button {
+        width: 100%;
+    }
+}
