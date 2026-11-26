@@ -1,20 +1,31 @@
 
+/* =========================================
+   HAKILINK - LAWYER DASHBOARD
+   Main stylesheet
+========================================= */
+
+/* 1. ROOT VARIABLES */
 :root {
     --navy: #0B2D52;
     --navy-dark: #061F36;
     --navy-light: #123F6B;
     --gold: #D9A928;
     --gold-light: #F2D36A;
+
     --background: #F5F7FA;
     --surface: #FFFFFF;
+
     --text-dark: #10243A;
     --text-medium: #66788A;
     --border: #DCE3EA;
+
     --success: #18794E;
     --danger: #B42318;
+
     --shadow: 0 5px 20px rgba(11, 45, 82, 0.05);
 }
 
+/* 2. GLOBAL STYLES */
 * {
     box-sizing: border-box;
 }
@@ -29,7 +40,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
     font: inherit;
 }
 
@@ -39,34 +51,69 @@ button {
 
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
-    outline: 3px solid rgba(217, 169, 40, 0.45);
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(217, 169, 40, 0.35);
     outline-offset: 2px;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+/* 3. MAIN LAYOUT */
 .app-layout {
     min-height: 100vh;
 }
 
+.main-area {
+    min-height: 100vh;
+    margin-left: 252px;
+}
+
+.page-content {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 30px 34px;
+}
+
+.dashboard-section {
+    display: none;
+}
+
+.dashboard-section.active {
+    display: block;
+}
+
+/* 4. SIDEBAR */
 .sidebar {
     width: 252px;
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 20;
+
     display: flex;
     flex-direction: column;
+
     padding: 28px 18px 18px;
+
     background: var(--navy-dark);
     color: #FFFFFF;
+
+    overflow-y: auto;
 }
 
 .brand {
     display: flex;
     align-items: center;
     gap: 11px;
+
     padding: 0 10px 35px;
+
     color: #FFFFFF;
     text-decoration: none;
+
     font-size: 23px;
     font-weight: 800;
 }
@@ -74,11 +121,14 @@ select:focus-visible {
 .brand-icon {
     display: grid;
     place-items: center;
+
     width: 40px;
     height: 40px;
+
     border-radius: 12px;
     background: var(--gold);
     color: var(--navy-dark);
+
     font-size: 24px;
 }
 
@@ -102,52 +152,78 @@ select:focus-visible {
 
 .navigation {
     display: grid;
-    gap: 7px;
+    gap: 6px;
 }
 
-.nav-link {
+/* Sidebar navigation typography fix */
+.sidebar .nav-link {
     width: 100%;
+    min-height: 43px;
+
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 13px 12px;
+    gap: 10px;
+
+    padding: 11px 12px;
+
     border: 0;
     border-radius: 9px;
+
     background: transparent;
     color: #CFD8E3;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+
     text-align: left;
+    text-decoration: none;
+
     transition: background 0.2s, color 0.2s;
 }
 
-.nav-link > span:first-child {
+.sidebar .nav-link > span:first-child {
     width: 22px;
-    font-size: 19px;
+    min-width: 22px;
+
+    font-size: 17px;
+    line-height: 1;
+
     text-align: center;
 }
 
-.nav-link:hover {
+.sidebar .nav-link:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #FFFFFF;
 }
 
-.nav-link.active {
+.sidebar .nav-link.active {
     background: var(--gold);
     color: var(--navy-dark);
-    font-weight: 750;
+    font-weight: 700;
 }
 
 .nav-count {
     min-width: 23px;
     margin-left: auto;
     padding: 4px 6px;
+
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.12);
+
     text-align: center;
     font-size: 11px;
 }
 
 .nav-link.active .nav-count {
     background: rgba(6, 31, 54, 0.12);
+}
+
+.nav-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .sidebar-bottom {
@@ -157,6 +233,7 @@ select:focus-visible {
 .sidebar-help {
     margin: 20px 0;
     padding: 16px;
+
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
 }
@@ -164,12 +241,15 @@ select:focus-visible {
 .help-icon {
     display: grid;
     place-items: center;
+
     width: 28px;
     height: 28px;
     margin-bottom: 12px;
+
     border-radius: 50%;
     background: var(--gold);
     color: var(--navy-dark);
+
     font-weight: 800;
 }
 
@@ -187,11 +267,15 @@ select:focus-visible {
 .logout-button {
     width: 100%;
     padding: 13px;
+
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 9px;
+
     background: transparent;
     color: #FFFFFF;
+
     text-align: left;
+    font-size: 13px;
 }
 
 .logout-button:hover {
@@ -202,17 +286,16 @@ select:focus-visible {
     margin-right: 10px;
 }
 
-.main-area {
-    min-height: 100vh;
-    margin-left: 252px;
-}
-
+/* 5. TOPBAR */
 .topbar {
     min-height: 83px;
+
     display: flex;
     align-items: center;
     gap: 18px;
+
     padding: 16px 34px;
+
     border-bottom: 1px solid var(--border);
     background: var(--surface);
 }
@@ -239,9 +322,11 @@ select:focus-visible {
     display: grid;
     flex-shrink: 0;
     place-items: center;
+
     border-radius: 50%;
     background: var(--navy);
     color: var(--gold-light);
+
     font-weight: 800;
 }
 
@@ -272,27 +357,15 @@ select:focus-visible {
     font-size: 24px;
 }
 
-.page-content {
-    width: 100%;
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 30px 34px;
-}
-
-.dashboard-section {
-    display: none;
-}
-
-.dashboard-section.active {
-    display: block;
-}
-
+/* 6. WELCOME PANEL */
 .welcome-panel {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+
     padding: 32px;
+
     border-radius: 16px;
     background: linear-gradient(120deg, var(--navy-dark), var(--navy-light));
     color: #FFFFFF;
@@ -322,33 +395,19 @@ select:focus-visible {
 .welcome-symbol {
     display: grid;
     place-items: center;
+
     width: 95px;
     height: 95px;
     flex-shrink: 0;
+
     border: 1px solid rgba(242, 211, 106, 0.45);
     border-radius: 50%;
+
     color: var(--gold-light);
     font-size: 53px;
 }
-.nav-icon img{
-    width: 40px;
-    height: 26px;
 
-    object-fit: cover;
-
-}
-.stat-icon img {
-    width: 40px;
-    height: 26px;
-
-    object-fit: cover;
-}
-.logo-icon img {
-    width: 24px;
-    height: 24px;
-
-    object-fit: contain;
-}
+/* 7. STATISTICS */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -371,11 +430,25 @@ select:focus-visible {
 .stat-icon {
     display: grid;
     place-items: center;
+
     width: 42px;
     height: 42px;
     margin-bottom: 17px;
+
     border-radius: 12px;
     font-size: 21px;
+}
+
+.stat-icon img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+.logo-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .gold-bg {
@@ -411,6 +484,7 @@ select:focus-visible {
     font-size: 12px;
 }
 
+/* 8. CONTENT CARDS */
 .content-card {
     min-width: 0;
     margin-bottom: 22px;
@@ -449,6 +523,7 @@ select:focus-visible {
     color: #986F00;
 }
 
+/* 9. SECTION HEADINGS */
 .section-intro {
     margin-bottom: 23px;
 }
@@ -469,6 +544,24 @@ select:focus-visible {
     line-height: 1.6;
 }
 
+.section-heading {
+    margin-bottom: 25px;
+}
+
+.section-heading h2 {
+    margin: 0 0 8px;
+    color: var(--navy);
+    font-size: 24px;
+}
+
+.section-heading p {
+    margin: 0;
+    color: var(--text-medium);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 10. TOOLBARS AND SEARCH */
 .toolbar {
     display: flex;
     gap: 12px;
@@ -482,8 +575,10 @@ select:focus-visible {
     min-width: 0;
     width: 100%;
     padding: 12px 13px;
+
     border: 1px solid var(--border);
     border-radius: 8px;
+
     background: #FFFFFF;
     color: var(--text-dark);
 }
@@ -496,6 +591,14 @@ select:focus-visible {
     width: 190px;
 }
 
+.toolbar input:focus,
+.toolbar select:focus,
+.form-field input:focus,
+.form-field select:focus {
+    border-color: var(--gold);
+}
+
+/* 11. DATA LISTS */
 .data-list {
     display: grid;
     gap: 12px;
@@ -505,7 +608,9 @@ select:focus-visible {
     display: flex;
     align-items: flex-start;
     gap: 14px;
+
     padding: 16px 0;
+
     border-bottom: 1px solid #EDF0F4;
 }
 
@@ -551,10 +656,13 @@ select:focus-visible {
 
 .small-button {
     padding: 8px 11px;
+
     border: 1px solid var(--border);
     border-radius: 7px;
+
     background: #FFFFFF;
     color: var(--navy);
+
     font-size: 12px;
     font-weight: 700;
 }
@@ -569,6 +677,10 @@ select:focus-visible {
     color: #FFFFFF;
 }
 
+.small-button.accept:hover {
+    background: var(--navy-dark);
+}
+
 .small-button.decline {
     color: var(--danger);
 }
@@ -576,10 +688,13 @@ select:focus-visible {
 .status-pill {
     display: inline-flex;
     align-items: center;
+
     padding: 5px 9px;
+
     border-radius: 20px;
     background: #EDF0F4;
     color: #475467;
+
     font-size: 11px;
     font-weight: 800;
     text-transform: capitalize;
@@ -604,6 +719,11 @@ select:focus-visible {
     color: #B42318;
 }
 
+.status-pill.withdrawn {
+    background: #EDF0F4;
+    color: #596579;
+}
+
 .empty-state {
     padding: 22px 10px;
     color: var(--text-medium);
@@ -611,11 +731,14 @@ select:focus-visible {
     line-height: 1.7;
 }
 
+/* 12. PAGE MESSAGES */
 .page-message {
     margin-bottom: 20px;
     padding: 13px 15px;
+
     border: 1px solid var(--border);
     border-radius: 9px;
+
     background: #FFFFFF;
     line-height: 1.6;
 }
@@ -638,6 +761,7 @@ select:focus-visible {
     color: #184E77;
 }
 
+/* 13. PROFESSIONAL PROFILE */
 .profile-layout {
     display: grid;
     grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.8fr);
@@ -671,9 +795,11 @@ select:focus-visible {
 .profile-role {
     display: inline-block;
     padding: 7px 12px;
+
     border-radius: 20px;
     background: #FFF4CF;
     color: #795B08;
+
     font-size: 12px;
     font-weight: 800;
 }
@@ -698,8 +824,8 @@ select:focus-visible {
 }
 
 .form-field label {
-    font-weight: 700;
     font-size: 13px;
+    font-weight: 700;
 }
 
 .form-field input:disabled {
@@ -719,10 +845,13 @@ select:focus-visible {
 
 .primary-button {
     padding: 12px 20px;
+
     border: 0;
     border-radius: 8px;
+
     background: var(--navy);
     color: #FFFFFF;
+
     font-weight: 750;
 }
 
@@ -736,13 +865,17 @@ button:disabled {
     opacity: 0.65;
 }
 
+/* 14. MESSAGING */
 .messages-layout {
     display: grid;
     grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1.6fr);
+
     min-height: 480px;
     overflow: hidden;
+
     border: 1px solid var(--border);
     border-radius: 14px;
+
     background: #FFFFFF;
     box-shadow: var(--shadow);
 }
@@ -761,10 +894,13 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: 10px;
+
     width: 100%;
     padding: 16px;
+
     border: 0;
     border-bottom: 1px solid #EDF0F4;
+
     background: #FFFFFF;
     color: var(--text-dark);
     text-align: left;
@@ -774,10 +910,11 @@ button:disabled {
 .conversation-item.selected {
     background: #F0F5FA;
 }
-.conversation-info {
-    flex: 1;
-    min-width: 0;
+
+.conversation-item.has-unread {
+    background: #FFF9E9;
 }
+
 .conversation-info {
     flex: 1;
     min-width: 0;
@@ -805,23 +942,24 @@ button:disabled {
 .conversation-info p {
     margin-top: 5px;
 }
-.conversation-item strong,
-.conversation-item span,
-.conversation-item p {
-    display: block;
-    overflow-wrap: anywhere;
-}
 
-.conversation-item strong {
-    margin-bottom: 6px;
-}
+.conversation-unread-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-.conversation-item span,
-.conversation-item p {
-    margin: 0;
-    color: var(--text-medium);
-    font-size: 12px;
-    line-height: 1.6;
+    min-width: 21px;
+    height: 21px;
+    margin-left: auto;
+    padding: 0 6px;
+
+    border-radius: 50px;
+    background: var(--gold);
+    color: var(--navy-dark);
+
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
 }
 
 .chat-panel {
@@ -834,6 +972,7 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: 12px;
+
     padding: 17px;
     border-bottom: 1px solid var(--border);
 }
@@ -855,8 +994,10 @@ button:disabled {
     flex: 1;
     flex-direction: column;
     gap: 12px;
+
     min-height: 270px;
     max-height: 440px;
+
     overflow-y: auto;
     padding: 18px;
 }
@@ -864,15 +1005,19 @@ button:disabled {
 .message-bubble {
     max-width: 82%;
     align-self: flex-start;
+
     padding: 11px 13px;
+
     border-radius: 12px 12px 12px 3px;
     background: #EEF2F6;
+
     overflow-wrap: anywhere;
     line-height: 1.6;
 }
 
 .message-bubble.mine {
     align-self: flex-end;
+
     border-radius: 12px 12px 3px 12px;
     background: var(--navy);
     color: #FFFFFF;
@@ -889,58 +1034,52 @@ button:disabled {
     display: flex;
     align-items: flex-end;
     gap: 10px;
+
     width: 100%;
     padding: 14px;
+
     border-top: 1px solid var(--border);
     background: #FFFFFF;
 }
 
-.message-form button {
-    padding: 0 17px;
-    border: 0;
-    border-radius: 8px;
-    background: var(--navy);
-    color: #FFFFFF;
-    font-weight: 750;
-}
 .message-form textarea {
     flex: 1;
     display: block;
+
     min-width: 0;
     width: 100%;
     min-height: 85px;
     max-height: 180px;
+
     padding: 14px 16px;
 
     border: 1px solid var(--border);
     border-radius: 12px;
 
     background: #FFFFFF;
-    color: #10243A;
+    color: var(--text-dark);
 
     font-family: inherit;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
 
     resize: vertical;
     overflow-y: auto;
-    box-sizing: border-box;
-
     outline: none;
 }
 
 .message-form textarea:focus {
     border-color: var(--gold);
-    background: #FFFFFF;
     box-shadow: 0 0 0 3px rgba(217, 169, 40, 0.12);
 }
 
 .message-form textarea::placeholder {
     color: var(--text-medium);
-    opacity: 1;
 }
+
 .message-form button {
     flex-shrink: 0;
+
     min-width: 75px;
     min-height: 48px;
     padding: 0 18px;
@@ -959,47 +1098,612 @@ button:disabled {
     background: var(--navy-light);
 }
 
-.message-form button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Smaller screens */
-@media (max-width: 600px) {
-    .message-form {
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .message-form textarea {
-        min-height: 46px;
-        padding: 11px 12px;
-        font-size: 13px;
-    }
-
-    .message-form button {
-        min-width: 65px;
-        min-height: 46px;
-        padding: 0 13px;
-        font-size: 12px;
-    }
-}
-
-.page-footer {
+/* 15. LAWYER FEEDBACK */
+.feedback-group {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    width: 100%;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.feedback-label {
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.feedback-input {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: #FFFFFF;
+    color: var(--text-dark);
+
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feedback-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(217, 169, 40, 0.15);
+}
+
+.feedback-input::placeholder {
+    color: var(--text-medium);
+}
+
+.saved-feedback {
+    margin-top: 16px;
+    padding: 14px;
+
+    border-left: 4px solid var(--gold);
+    border-radius: 6px;
+
+    background: #F5F7FA;
+}
+
+.saved-feedback strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--navy);
+    font-size: 13px;
+}
+
+.saved-feedback p {
+    margin: 0;
+    color: var(--text-medium);
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* 16. NOTIFICATIONS */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-left: auto;
+}
+
+.notification-wrapper {
+    position: relative;
+}
+
+.notification-button {
+    position: relative;
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: #FFFFFF;
+    color: var(--navy);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 23px;
+    transition: 0.2s ease;
+}
+
+.notification-button:hover {
+    background: #F5F7FA;
+    border-color: var(--gold);
+}
+
+.notification-bell {
+    line-height: 1;
+}
+
+.notification-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+
+    border-radius: 20px;
+    background: #D93636;
+    color: #FFFFFF;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-count[hidden],
+.notification-dropdown[hidden] {
+    display: none !important;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 55px;
+    right: 0;
+
+    width: 360px;
+    max-width: calc(100vw - 30px);
+
+    background: #FFFFFF;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    box-shadow: 0 12px 35px rgba(6, 31, 54, 0.16);
+
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.notification-header {
+    padding: 17px;
+
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 15px;
-    margin-top: 32px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+    gap: 10px;
+
+    border-bottom: 1px solid #E8EDF2;
+}
+
+.notification-header h3 {
+    margin: 0 0 5px;
+    color: var(--navy);
+    font-size: 16px;
+}
+
+.notification-header p {
+    margin: 0;
     color: var(--text-medium);
     font-size: 12px;
 }
 
-[hidden] {
-    display: none !important;
+#markAllReadButton {
+    border: none;
+    background: transparent;
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
+#markAllReadButton:hover {
+    color: #B78A18;
+}
+
+.notification-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+
+    padding: 15px 17px;
+
+    border-bottom: 1px solid #EEF1F5;
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+    background: #F5F7FA;
+}
+
+.notification-item.unread {
+    background: #FFF9E9;
+}
+
+.notification-item.unread:hover {
+    background: #FFF4D4;
+}
+
+.notification-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-item h4 {
+    margin: 0 0 5px;
+    color: var(--navy);
+    font-size: 13px;
+}
+
+.notification-item p {
+    margin: 0 0 7px;
+    color: var(--text-medium);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.notification-item small {
+    color: #8996A3;
+    font-size: 10px;
+}
+
+.notification-empty {
+    padding: 25px 15px;
+    text-align: center;
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+/* 17. LAW FIRM DIRECTORY */
+#find-firms,
+#my-applications {
+    padding: 25px;
+}
+
+#firmSearch {
+    display: block;
+
+    width: 100%;
+    max-width: 650px;
+
+    margin-bottom: 25px;
+    padding: 14px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    background: #FFFFFF;
+    color: var(--text-dark);
+
+    font-size: 14px;
+    outline: none;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#firmSearch:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(217, 169, 40, 0.12);
+}
+
+#firmSearch::placeholder {
+    color: #98A2B3;
+}
+
+#firmsList,
+#applicationsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+/* Firm and application cards */
+#firmsList .data-item,
+#applicationsList .data-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    min-width: 0;
+    height: 100%;
+
+    padding: 22px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: #FFFFFF;
+    box-shadow: 0 3px 12px rgba(6, 31, 54, 0.04);
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#firmsList .data-item:hover,
+#applicationsList .data-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(6, 31, 54, 0.08);
+}
+
+#firmsList .data-item-main,
+#applicationsList .data-item-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    width: 100%;
+}
+
+#firmsList h3,
+#applicationsList h3 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 18px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+#firmsList p,
+#applicationsList p {
+    margin: 0;
+    color: var(--text-medium);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* 18. APPLICATION FORM */
+.firm-application-form {
+    display: block;
+    width: 100%;
+
+    margin-top: 22px;
+    padding: 24px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: #F8FAFC;
+    box-shadow: 0 4px 14px rgba(11, 45, 82, 0.05);
+}
+
+.firm-application-form h4 {
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid var(--border);
+
+    color: var(--navy);
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.firm-application-form .feedback-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    width: 100%;
+    margin: 0 0 19px;
+}
+
+.firm-application-form .feedback-label {
+    color: var(--text-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.firm-application-form .feedback-input {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+
+    padding: 13px 14px;
+
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+
+    background: #FFFFFF;
+    color: var(--text-dark);
+
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+
+    resize: vertical;
+    outline: none;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.firm-application-form textarea.feedback-input {
+    min-height: 115px;
+}
+
+.firm-application-form .feedback-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(217, 169, 40, 0.13);
+}
+
+.firm-application-form .feedback-input::placeholder {
+    color: #98A2B3;
+}
+
+/* Application form buttons */
+.firm-application-form .item-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 22px;
+}
+
+.firm-application-form button {
+    min-height: 42px;
+    padding: 11px 20px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    transition: all 0.2s ease;
+}
+
+.firm-application-form button[type="submit"],
+.firm-application-form .accept {
+    border: 1px solid var(--navy);
+    background: var(--navy);
+    color: #FFFFFF;
+}
+
+.firm-application-form button[type="submit"]:hover,
+.firm-application-form .accept:hover {
+    background: var(--navy-dark);
+}
+
+.firm-application-form .decline {
+    border: 1px solid var(--border);
+    background: #FFFFFF;
+    color: var(--text-medium);
+}
+
+.firm-application-form .decline:hover {
+    background: #EDF1F5;
+    color: var(--navy);
+}
+
+/* Application status */
+#applicationsList .status-pill {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+#applicationsList .status-pill.pending {
+    background: #FFF4D6;
+    color: #946200;
+}
+
+#applicationsList .status-pill.accepted {
+    background: #E5F5EB;
+    color: #167443;
+}
+
+#applicationsList .status-pill.declined {
+    background: #FDE8E7;
+    color: #B42318;
+}
+
+#applicationsList .status-pill.withdrawn {
+    background: #EDF0F4;
+    color: #596579;
+}
+
+/* Firm decision notes */
+#applicationsList .saved-feedback {
+    width: 100%;
+    padding: 12px;
+
+    background: #F5F7FA;
+    border-left: 3px solid var(--gold);
+    border-radius: 5px;
+}
+
+#applicationsList .saved-feedback strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--navy);
+    font-size: 13px;
+}
+
+#applicationsList .saved-feedback p {
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+/* Application buttons */
+#firmsList .small-button,
+#applicationsList .small-button {
+    padding: 10px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: background 0.2s ease;
+}
+
+#firmsList .small-button.accept {
+    background: var(--navy);
+    color: #FFFFFF;
+}
+
+#firmsList .small-button.accept:hover {
+    background: var(--navy-dark);
+}
+
+#applicationsList .small-button.decline {
+    background: #FFFFFF;
+    color: var(--danger);
+    border: 1px solid #F0B8B4;
+}
+
+#applicationsList .small-button.decline:hover {
+    background: #FFF1F0;
+}
+
+#firmsList button:disabled,
+#applicationsList button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Empty directory and application states */
+#firmsList .empty-state,
+#applicationsList .empty-state {
+    grid-column: 1 / -1;
+
+    padding: 30px;
+
+    text-align: center;
+    color: var(--text-medium);
+
+    background: #FFFFFF;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+}
+
+/* 19. FOOTER */
+.page-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-top: 32px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border);
+    color: var(--text-medium);
+
+    font-size: 12px;
+}
+
+/* =========================================
+   20. RESPONSIVE DESIGN
+========================================= */
+
+/* Tablets and smaller laptops */
 @media (max-width: 1100px) {
     .sidebar {
         width: 225px;
@@ -1022,10 +1726,12 @@ button:disabled {
     }
 }
 
+/* Mobile navigation and layout */
 @media (max-width: 800px) {
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.25s ease;
+
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.12);
     }
 
@@ -1054,9 +1760,14 @@ button:disabled {
     }
 }
 
+/* Phones */
 @media (max-width: 600px) {
     .topbar-user-info {
         display: none;
+    }
+
+    .topbar-actions {
+        gap: 10px;
     }
 
     .welcome-panel {
@@ -1133,273 +1844,107 @@ button:disabled {
         min-height: 400px;
     }
 
+    .message-form {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .message-form textarea {
+        min-height: 46px;
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+
+    .message-form button {
+        min-width: 65px;
+        min-height: 46px;
+        padding: 0 13px;
+        font-size: 12px;
+    }
+
     .page-footer {
         flex-direction: column;
     }
-}
 
-/* Inline lawyer feedback */
-.feedback-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-    width: 100%;
-}
-
-.feedback-label {
-    color: var(--navy, #0B2D52);
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.feedback-input {
-    width: 100%;
-    min-height: 90px;
-    padding: 12px 14px;
-    border: 1px solid var(--border, #DCE3EA);
-    border-radius: 8px;
-    background: #FFFFFF;
-    color: var(--text-dark, #10243A);
-    font: inherit;
-    font-size: 14px;
-    line-height: 1.6;
-    resize: vertical;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.feedback-input:focus {
-    outline: none;
-    border-color: var(--gold, #D9A928);
-    box-shadow: 0 0 0 3px rgba(217, 169, 40, 0.15);
-}
-
-.feedback-input::placeholder {
-    color: var(--text-medium, #66788A);
-}
-
-.saved-feedback {
-    margin-top: 16px;
-    padding: 14px;
-    border-left: 4px solid var(--gold, #D9A928);
-    border-radius: 6px;
-    background: #F5F7FA;
-}
-
-.saved-feedback strong {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--navy, #0B2D52);
-    font-size: 13px;
-}
-
-.saved-feedback p {
-    margin: 0;
-    color: var(--text-medium, #66788A);
-    font-size: 14px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-}
-
-/* =========================================
-   LAWYER NOTIFICATIONS
-========================================= */
-
-.topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-left: auto;
-}
-
-.notification-wrapper {
-    position: relative;
-}
-
-.notification-button {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--border, #DCE3EA);
-    border-radius: 12px;
-    background: #ffffff;
-    color: var(--navy, #0B2D52);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-    transition: 0.2s ease;
-}
-
-.notification-button:hover {
-    background: #f5f7fa;
-    border-color: var(--gold, #D9A928);
-}
-
-.notification-bell {
-    line-height: 1;
-}
-
-.notification-count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    min-width: 19px;
-    height: 19px;
-    padding: 0 5px;
-    border-radius: 20px;
-    background: #d93636;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.notification-count[hidden],
-.notification-dropdown[hidden] {
-    display: none !important;
-}
-
-.notification-dropdown {
-    position: absolute;
-    top: 55px;
-    right: 0;
-    width: 360px;
-    max-width: calc(100vw - 30px);
-    background: #ffffff;
-    border: 1px solid #DCE3EA;
-    border-radius: 14px;
-    box-shadow: 0 12px 35px rgba(6, 31, 54, 0.16);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.notification-header {
-    padding: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    border-bottom: 1px solid #E8EDF2;
-}
-
-.notification-header h3 {
-    margin: 0 0 5px;
-    color: #0B2D52;
-    font-size: 16px;
-}
-
-.notification-header p {
-    margin: 0;
-    color: #66788A;
-    font-size: 12px;
-}
-
-#markAllReadButton {
-    border: none;
-    background: transparent;
-    color: #0B2D52;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-#markAllReadButton:hover {
-    color: #B78A18;
-}
-
-.notification-list {
-    max-height: 350px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    display: flex;
-    gap: 12px;
-    padding: 15px 17px;
-    border-bottom: 1px solid #EEF1F5;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.notification-item:hover {
-    background: #F5F7FA;
-}
-
-.notification-item.unread {
-    background: #FFF9E9;
-}
-
-.notification-item.unread:hover {
-    background: #FFF4D4;
-}
-
-.notification-item-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.notification-item h4 {
-    margin: 0 0 5px;
-    color: #0B2D52;
-    font-size: 13px;
-}
-
-.notification-item p {
-    margin: 0 0 7px;
-    color: #66788A;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.notification-item small {
-    color: #8996A3;
-    font-size: 10px;
-}
-
-.notification-empty {
-    padding: 25px 15px;
-    text-align: center;
-    color: #66788A;
-    font-size: 13px;
-}
-
-@media (max-width: 600px) {
-    .topbar-actions {
-        gap: 10px;
+    #find-firms,
+    #my-applications {
+        padding: 15px;
     }
 
-    .topbar-user-info {
-        display: none;
+    #firmsList,
+    #applicationsList {
+        grid-template-columns: 1fr;
+    }
+
+    #firmSearch {
+        max-width: 100%;
+    }
+
+    .firm-application-form {
+        padding: 17px;
+    }
+
+    .firm-application-form .item-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .firm-application-form button {
+        width: 100%;
     }
 
     .notification-dropdown {
         right: -55px;
     }
 }
-.conversation-item.has-unread {
-    background: #FFF9E9;
+/* ============================================
+   APPLICATION DOCUMENT UPLOADS
+============================================ */
+
+.uploaded-document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
 }
 
-.conversation-unread-count {
-    display: inline-flex;
+.uploaded-document-item {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    min-width: 21px;
-    height: 21px;
-    padding: 0 6px;
-    border-radius: 50px;
-    background: #D9A928;
-    color: #061F36;
-    font-size: 11px;
-    font-weight: 700;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border, #DCE3EA);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.uploaded-document-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.uploaded-document-details strong {
+    overflow-wrap: anywhere;
+}
+
+.uploaded-document-details small {
+    color: var(--text-medium, #66788A);
+    text-transform: capitalize;
+}
+
+.uploaded-document-item button {
     flex-shrink: 0;
-    margin-left: auto;
+}
+
+.firm-application-form input[type="file"] {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px dashed var(--border, #DCE3EA);
+    border-radius: 8px;
+    background: #fff;
 }

@@ -46,6 +46,13 @@
             </div> Messages
             <span class="nav-count" id="messageNavCount">0</span>
           </button>
+          <button class="nav-link" data-section="find-firms">
+            <span>Find Law Firms</span>
+          </button>
+
+          <button class="nav-link" data-section="my-applications">
+            <span>My Applications</span>
+          </button>
           <button class="nav-link" data-section="profile">
             <div class="nav-icon">
               <img src="../assets/profile2.png" alt="Profile">
@@ -320,6 +327,34 @@
             </div>
           </section>
 
+          <!-- FIND LAW FIRMS -->
+          <section id="find-firms" class="dashboard-section">
+            <div class="section-heading">
+              <h2>Find Law Firms</h2>
+              <p>Explore law firms and apply to join their teams.</p>
+            </div>
+
+            <input
+              type="search"
+              id="firmSearch"
+              placeholder="Search by firm name, location or practice area...">
+
+            <div id="firmsList">
+              <p class="empty-state">Loading law firms...</p>
+            </div>
+          </section>
+
+          <!-- MY APPLICATIONS -->
+          <section id="my-applications" class="dashboard-section">
+            <div class="section-heading">
+              <h2>My Applications</h2>
+              <p>Track the progress of your applications to law firms.</p>
+            </div>
+
+            <div id="applicationsList">
+              <p class="empty-state">Loading your applications...</p>
+            </div>
+          </section>
           <!-- PROFESSIONAL PROFILE -->
           <section class="dashboard-section" id="profile">
             <div class="section-intro">
